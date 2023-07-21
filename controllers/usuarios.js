@@ -10,16 +10,18 @@ const Usuario = require('../models/usuario');
 //Aqui lo que se maneja es la url en parametros
 const usuariosGet = async (req = request, res = response) => {
   try {
-    const { limit = 5, desde = 0 } = req.query;
+    const { limit = 4, page = 1 } = req.query;
+    const parsedLimit = parseInt(limit);
+    const parsedPage = parseInt(page);
+    const skip = (parsedPage - 1) * parsedLimit;
     const query = { estado: true };
 
     const [total, usuarios] = await Promise.all([
-      Usuario.count(query),
+      Usuario.countDocuments(query),
       Usuario.find(query)
-        .skip(Number(desde))
-        .limit(Number(limit))
+        .skip(skip)
+        .limit(parsedLimit)
     ]);
-
 
     res.json({
       total,
@@ -31,7 +33,8 @@ const usuariosGet = async (req = request, res = response) => {
       msg: 'No se pudieron mostrar los usuarios'
     });
   }
-}
+};
+
 
 
 const usuariosPut = async (req, res = response) => {
@@ -87,7 +90,7 @@ const usuariosDeleteP = async (req, res = response ) =>{
     if (usuarioEliminado.deletedCount === 0) {
       return res.status(404).json({
         ok: false,
-        mensaje: 'Usuario no encontrado',
+        msg: 'Usuario no encontrado',
       });
     }
     res.json({

@@ -10,7 +10,8 @@ const { cerrarSesion,
         nuevoPassword,
         registrar,
         deleteMe,
-        getMe} = require('../controllers/auth');
+        getMe,
+        oneUser} = require('../controllers/auth');
 const { validarCampos } = require('../middlewares/validar-campos');
 const bcryptjs = require('bcryptjs');
 const { emailExiste } = require('../helpers/db-validators');
@@ -56,16 +57,13 @@ router.post('/google',[
 ], googleSignIn );
 
 
-//Rutas de mi usuario//
-
-router.get('/me',[
-    protect,
-    validarCampos
-], getMe) 
-router.delete('/deleteMe',[
-    protect,
-    validarCampos
-], deleteMe)
+//RUTAS DEL USUARIO//
+//la ruta /me está protegida por el middleware protect, que verifica la autenticación del usuario a través del token y 
+//configura req.usuario con la información del usuario. Luego, el middleware getMe verifica que req.usuario esté configurado 
+//y extrae el id del usuario para que esté disponible en la consulta de la base de datos realizada por el middleware oneUser. 
+//Finalmente, oneUser busca el documento del usuario por el id y devuelve una respuesta JSON con el resultado.
+router.route('/me').get(protect, getMe, oneUser);
+router.route('/deleteMe').delete(protect,deleteMe);
 
 
 

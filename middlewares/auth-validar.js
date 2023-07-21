@@ -30,6 +30,8 @@ const protect = async ( req, res, next) =>{
     
       //ACCESO A LA RUTA
       req.usuario = usuario;
+
+      
       next();
     } catch (error) {
       return res.status(401).send("Token inválido");

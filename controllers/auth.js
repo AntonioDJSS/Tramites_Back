@@ -6,7 +6,7 @@ const { googleVerify } = require("../helpers/google-verify");
 const generarId = require("../helpers/generarId");
 const {emailOlvidePassword} = require('../helpers/email')
 const {emailRegistro} = require('../helpers/email')
-
+const {getOne} = require('./handleFactory')
 
 const createSendToken = async (usuario, statusCode,req,res) =>{
     //Generar el JWT
@@ -98,8 +98,7 @@ const registrar = async (req, res) => {
         msg: 'No se puede registrar el Usuario'
       });
     }
-  };
-
+};
 
 const cerrarSesion = async (req, res) =>{
      res.cookie('jwt', 'CerrarSesion',{
@@ -178,10 +177,8 @@ const comprobarToken = async (req, res= response ) =>{
 };
 
 const nuevoPassword = async (req, res = response) =>{
-
     const { token } = req.params;
     const { password } = req.body;
-
     const usuario = await Usuario.findOne({ token });
     if (usuario) {
         usuario.password = password;
@@ -202,15 +199,10 @@ const nuevoPassword = async (req, res = response) =>{
 }
 
 const googleSignIn = async ( req, res = response ) =>{
-
     const { id_token } = req.body;
-
     try {
-
         const { correo, nombre, img }= await googleVerify( id_token );
-
         let usuario = await Usuario.findOne({ correo });
-
         if (!usuario) {
             //Tengo que crearlo
             const data = {
@@ -224,38 +216,29 @@ const googleSignIn = async ( req, res = response ) =>{
             usuario = new Usuario(data);
             await usuario.save();
         }
-
         //Si el usuario en DB
         if ( !usuario.estado ) {
             return res.status(401).json({
                 msg: 'Hable con el administrador, usuario bloqueado'
             });
         }
-
         //Generar JWT
         const token = await generarJWT( usuario.id );
-
-
         res.json({
             usuario,
             token
         });
-        
     } catch (error) {
         res.status(400).json({
             ok: false,
             msg: 'El Token no se pudo verificar'
         })
-        
-    }
-
-   
+    } 
 }
-
 
 ///Control del Usuario/////
 const deleteMe = async(req,res,next)=>{
-    await User.findByIdAndUpdate(req.user.id,{activo: false});
+    await Usuario.findByIdAndUpdate(req.usuario.id,{activo: false});
     res.status(204).json({
         status: "successful",
         data: null
@@ -263,9 +246,15 @@ const deleteMe = async(req,res,next)=>{
 };
 
 const getMe = (req,res,next)=>{
-    req.params.id = req.user.id;
-    next();
+   // Verificar si req.usuario está definido
+   req.params.id = req.usuario.id;
+
+
+  
+  next();
 }
+
+const oneUser = getOne(Usuario);
 
 
 module.exports ={
@@ -278,6 +267,6 @@ module.exports ={
     googleSignIn,
     registrar,
     deleteMe,
-    getMe
- 
+    getMe,
+    oneUser
 }
