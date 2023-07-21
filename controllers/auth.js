@@ -249,6 +249,12 @@ const getMe = (req,res,next)=>{
    // Verificar si req.usuario está definido
    req.params.id = req.usuario.id;
 
+   if (!req.params.id) {
+        return res.status(404).json({
+            msg: "El usuario por id no existe getMe"
+        })
+   }
+
 
   
   next();
