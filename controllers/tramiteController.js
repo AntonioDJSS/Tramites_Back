@@ -81,30 +81,30 @@ const borrarAllTramite = async (req, res) => {
   }
 };
 
-const buscarTramite = async (req, res) =>{
-
-  const { nombre } = req.query; // Obtener el parámetro de consulta 'q'
+const buscarTramite = async (req, res) => {
+  const { nombre, valor } = req.query;
 
   try {
-    // Realizar la búsqueda en la base de datos utilizando Mongoose
-      const tramites = await Tramite.find({
-      'tramites': {
-        $elemMatch: {
-          nombre: 'Nombre',
-          valor: { $regex: nombre, $options: 'i' }
-        }
-      }
-      });
-
-    
+    // Creamos un objeto de consulta
+    const query = {};
+    // Si el parámetro 'nombre' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'nombre' del array 'tramites'
+    if (nombre) {
+      query['tramites.nombre'] = { $regex: nombre, $options: 'i' };
+    }
+    // Si el parámetro 'valor' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'valor' del array 'tramites'
+    if (valor) {
+      query['tramites.valor'] = { $regex: valor, $options: 'i' };
+    }
+    // Realizamos la búsqueda en la base de datos utilizando Mongoose
+    const tramites = await Tramite.find(query);
     res.status(200).json({
       status: 'success',
       tramites
     });
-} catch (error) {
-  console.error(error);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: 'Error al buscar el tramite' });
-}
+  }
 };
 
 const cargarTramite = async (req, res) => {
@@ -172,21 +172,27 @@ const crearTramite = async (req, res) => {
   }
 }; 
 
-const mostrarTramite = async(req, res) =>{
-
+const mostrarTramite = async (req, res) => {
   try {
-      const tramite = await Tramite.find();
+      // Obtener los valores de page y limit del query string (si no se proporcionan, se utilizarán valores predeterminados)
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10; // Por ejemplo, 10 registros por página
+
+      // Calcular el número de documentos que se deben omitir antes de mostrar los registros de la página actual
+      const skip = (page - 1) * limit;
+
+      // Realizar la consulta a la base de datos con el paginado
+      const tramite = await Tramite.find().skip(skip).limit(limit);
 
       res.status(200).json({
           status: "success",
           data: tramite,
-      })
+      });
   } catch (error) {
       res.status(500).json({
-          msg: "Error al mostrar los registros"
-      })
+          msg: "Error al mostrar los registros",
+      });
   }
-
 };
 
 module.exports ={

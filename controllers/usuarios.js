@@ -5,8 +5,6 @@ const bcryptjs = require('bcryptjs');
 const generarId = require('../helpers/generarId');
 const Usuario = require('../models/usuario');
 
- 
-
 //Aqui lo que se maneja es la url en parametros
 const usuariosGet = async (req = request, res = response) => {
   try {

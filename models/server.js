@@ -11,7 +11,6 @@ class Server{
         this.usuariosPath = '/api/usuarios';
         this.authPath     = '/api/auth';
         this.uploadsPath     = '/api/uploads';
-        this.tramitesPath     = '/api/tramites';
         this.tramiteControllerPath = '/api/tramiteController';
 
         //Conectar a base de datos
@@ -72,10 +71,9 @@ class Server{
     routes(){
         //Vamos a usar un middleware para otorgarle ciertas rutas
         //Conte middleware se llama ak archivo donde tenemos las rutas
-        this.app.use(this.authPath,     require('../routes/auth'));
+        this.app.use(this.authPath,     require('../routes/authRoutes'));
         this.app.use(this.usuariosPath, require('../routes/usuarios'));
         this.app.use(this.uploadsPath,      require('../routes/uploads'));
-        this.app.use(this.tramitesPath,      require('../routes/tramites'));
         this.app.use(this.tramiteControllerPath, require('../routes/tramiteRoutes'))
     
         // Middleware para manejar rutas no reconocidas

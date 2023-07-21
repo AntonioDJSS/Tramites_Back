@@ -8,10 +8,12 @@ const { cerrarSesion,
         googleSignIn,  
         olvidePassword, 
         nuevoPassword,
-        registrar,
-        deleteMe,
-        getMe,
-        oneUser} = require('../controllers/auth');
+        registrar
+        } = require('../controllers/authController');
+const { deleteMe, 
+        getMe, 
+        oneUser} = require('../controllers/usuarioControler')
+
 const { validarCampos } = require('../middlewares/validar-campos');
 const bcryptjs = require('bcryptjs');
 const { emailExiste } = require('../helpers/db-validators');
@@ -64,7 +66,7 @@ router.post('/google',[
 //Finalmente, oneUser busca el documento del usuario por el id y devuelve una respuesta JSON con el resultado.
 router.route('/me').get(protect, getMe, oneUser);
 router.route('/deleteMe').delete(protect,deleteMe);
-
+// router.route('/updateMe').patch(uploadUserPhoto,tamañoPhotoUser,updateMe);
 
 
 module.exports = router;

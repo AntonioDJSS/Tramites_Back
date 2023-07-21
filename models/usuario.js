@@ -18,6 +18,7 @@ const UsuarioSchema = Schema({
     },
     img: {
         type: String,
+        default: "https://iktan-training-production.s3.amazonaws.com/Usuarios/Foto+de+Perfil+Default/default.png"
     },
     rol: {
         type: String,
