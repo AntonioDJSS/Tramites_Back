@@ -2,6 +2,8 @@ const Tramite = require('../models/tramite')
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const xlsx = require('xlsx');
+const fs = require('fs');
+
 
 const actualizarTramite = async (req, res) => {
   const { id } = req.params;
@@ -13,9 +15,9 @@ const actualizarTramite = async (req, res) => {
     }
 
     const tramiteActualizado = tramite.toObject(); // Convertir a objeto JavaScript
-    
+
     tramiteActualizado.tramites = tramiteActualizado.tramites.map(
-        (tramiteAnterior, index) => {
+      (tramiteAnterior, index) => {
         const nuevoTramite = nuevosTramites[index];
         return {
           ...tramiteAnterior,
@@ -42,21 +44,21 @@ const actualizarTramite = async (req, res) => {
 };
 
 const borrarTramite = async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const tramite = await Tramite.findOne({ _id: id });
-      if (!tramite) {
-        return res.status(404).json({ msg: 'Tramite no encontrado' });
-      }
-      tramite.tramites = tramite.tramites.filter((t) => t._id.toString() !== id);
-      // Guardar los cambios utilizando la función `updateOne` de Mongoose
-      await Tramite.deleteOne({ _id: id }, { tramites: tramite.tramites });
-      res.status(200).json({ msg: 'Tramite eliminado correctamente' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ msg: 'Error al eliminar el tramite' });
+  const { id } = req.params;
+
+  try {
+    const tramite = await Tramite.findOne({ _id: id });
+    if (!tramite) {
+      return res.status(404).json({ msg: 'Tramite no encontrado' });
     }
+    tramite.tramites = tramite.tramites.filter((t) => t._id.toString() !== id);
+    // Guardar los cambios utilizando la función `updateOne` de Mongoose
+    await Tramite.deleteOne({ _id: id }, { tramites: tramite.tramites });
+    res.status(200).json({ msg: 'Tramite eliminado correctamente' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Error al eliminar el tramite' });
+  }
 };
 
 const borrarAllTramite = async (req, res) => {
@@ -82,8 +84,7 @@ const borrarAllTramite = async (req, res) => {
 };
 
 const buscarTramite = async (req, res) => {
-  const { nombre, valor } = req.query;
-
+  const { nombre, valor, page, limit } = req.query;
   try {
     // Creamos un objeto de consulta
     const query = {};
@@ -95,65 +96,121 @@ const buscarTramite = async (req, res) => {
     if (valor) {
       query['tramites.valor'] = { $regex: valor, $options: 'i' };
     }
-    // Realizamos la búsqueda en la base de datos utilizando Mongoose
-    const tramites = await Tramite.find(query);
+    // Convertir los parámetros de paginación y límite a números enteros
+    const pageNumber = parseInt(page) || 1;
+    const limitNumber = parseInt(limit) || 10; // Si no se proporciona 'limit', se asume un límite predeterminado de 10 registros por página
+    // Calcular el número de registros para omitir y paginar correctamente los resultados
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // Realizar la búsqueda en la base de datos utilizando Mongoose con paginación y límite
+    const tramites = await Tramite.find(query)
+      .skip(skip)
+      .limit(limitNumber);
     res.status(200).json({
       status: 'success',
-      tramites
+      page: pageNumber,
+      limit: limitNumber,
+      total: tramites.length,
+      tramites,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: 'Error al buscar el tramite' });
+    res.status(500).json({ msg: 'Error al buscar el trámite' });
   }
 };
 
 const cargarTramite = async (req, res) => {
   try {
-    ////////////////Ingresamos el archivo validando que es xlsx//////////////////
-         if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo ) {
-            res.status(400).json({ msg: 'No hay archivos que subir' });
-            return;
-        }
-        const { archivo } = req.files;
-        const nombreCortado = archivo.name.split('.');
-        const extension = nombreCortado[ nombreCortado.length - 1 ];
-        //Validar la extension
-        const extensionesValidas = [ 'xlsx' ];
-        if ( !extensionesValidas.includes( extension )) {
-            return res.status(400).json({
-                msg: `La extensión ${ extension } no es permitida, ${ extensionesValidas }`
-            });
-        }
-        const nombreTemp = uuidv4() + '.' + extension;
-        const uploadPath = path.join( __dirname, '../uploads/', nombreTemp);
-        archivo.mv(uploadPath, (err) => { 
-            if (err) {
-            return res.status(500).json({err});
-        }
-///////////////////////////////////////////////////////////////    
+    // Verificamos si se ha enviado un archivo
+    if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
+      return res.status(400).json({ error: 'No hay archivos que subir' });
+    }
 
-////////////////////////Leer archivo de excel /////////////////
-          //Leer el archivo atraves del buffer
-          //SINO TIENE ESPACIOS, NULL , VACIO. == NULL
+    const { archivo } = req.files;
+    const nombreCortado = archivo.name.split('.');
+    const extension = nombreCortado[nombreCortado.length - 1];
+
+    // Validar la extensión
+    const extensionesValidas = ['xlsx'];
+    if (!extensionesValidas.includes(extension)) {
+      return res.status(400).json({
+        error: `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
+      });
+    }
+
+    const nombreTemp = uuidv4() + '.' + extension;
+    const uploadPath = path.join(__dirname, '../uploads/', nombreTemp);
+
+    // Mover el archivo a la ubicación temporal
+    archivo.mv(uploadPath, async (err) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Error al mover el archivo' });
+      }
+
+      try {
+        // Leer el archivo a través del buffer
         const workbook = xlsx.readFile(uploadPath);
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        // Convertir los datos a JSON
-        const jsonData = xlsx.utils.sheet_to_json(worksheet);
-/////////////////////////////////////////////////////////////////////
 
-        console.log(jsonData)
+        // Convertir los datos a JSON incluyendo celdas vacías con valor null
+        const jsonData = xlsx.utils.sheet_to_json(worksheet, {
+          raw: false,
+          defval: null,
+        });
 
-        res.status(200).json({ 
-                    status: 'success',
-                    msg: 'File uploaded to ' + uploadPath
-                    });
-    });
-       } catch (error) {
+        // Procesar los datos (limpiar espacios) y guardarlos en el arreglo tramites
+        const tramites = [];
+        for (const row of jsonData) {
+          const tramite = []; // Crear un nuevo arreglo para cada fila
+          const keys = Object.keys(row);
+          for (const key of keys) {
+            let value = row[key];
+            // Convertir el valor a una cadena de texto antes de usar 'trim()'
+            value = String(value);
+            const cleanValue = value.trim() !== '' ? value.trim() : null; // Si está vacío, asignar null
+
+            // Verificar que el campo nombre tenga un valor antes de agregarlo al arreglo tramite
+            if (key.trim() !== '') {
+              tramite.push({ nombre: key, valor: cleanValue });
+            }
+          }
+          // Agregar el arreglo de la fila al arreglo principal tramites
+          tramites.push(tramite);
+
+        }
+        // console.log(tramites)
+
+        // Crear un documento de Tramite con los datos procesados y guardarlo en la base de datos
+        for (const tramite of tramites) {
+          try {
+            const nuevoTramite = new Tramite({ tramites: tramite });
+            await nuevoTramite.save();
+          } catch (error) {
+            console.log('Error al guardar el tramite:', error);
+            // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
+          }
+        }
+        // Liberar el archivo temporal
+        fs.unlinkSync(uploadPath);
+
+        res.status(200).json({
+          status: 'success',
+          data: tramites,
+          msg: 'File uploaded and processed successfully',
+        });
+      } catch (error) {
         console.log(error);
-        res.status(500).json({ msg: 'Error al actualizar al cargar el tramite' });
-       }
+        res.status(500).json({ error: 'Error al leer el archivo Excel o guardar en la base de datos' });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Error al cargar el trámite' });
+  }
 };
+
 
 const crearTramite = async (req, res) => {
   try {
@@ -170,38 +227,38 @@ const crearTramite = async (req, res) => {
       error: error.message,
     });
   }
-}; 
+};
 
 const mostrarTramite = async (req, res) => {
   try {
-      // Obtener los valores de page y limit del query string (si no se proporcionan, se utilizarán valores predeterminados)
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10; // Por ejemplo, 10 registros por página
+    // Obtener los valores de page y limit del query string (si no se proporcionan, se utilizarán valores predeterminados)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; // Por ejemplo, 10 registros por página
 
-      // Calcular el número de documentos que se deben omitir antes de mostrar los registros de la página actual
-      const skip = (page - 1) * limit;
+    // Calcular el número de documentos que se deben omitir antes de mostrar los registros de la página actual
+    const skip = (page - 1) * limit;
 
-      // Realizar la consulta a la base de datos con el paginado
-      const tramite = await Tramite.find().skip(skip).limit(limit);
+    // Realizar la consulta a la base de datos con el paginado
+    const tramite = await Tramite.find().skip(skip).limit(limit);
 
-      res.status(200).json({
-          status: "success",
-          data: tramite,
-      });
+    res.status(200).json({
+      status: "success",
+      data: tramite,
+    });
   } catch (error) {
-      res.status(500).json({
-          msg: "Error al mostrar los registros",
-      });
+    res.status(500).json({
+      msg: "Error al mostrar los registros",
+    });
   }
 };
 
-module.exports ={
-    actualizarTramite,
-    borrarTramite,
-    borrarAllTramite,
-    buscarTramite,
-    cargarTramite,
-    crearTramite,
-    mostrarTramite
-  
+module.exports = {
+  actualizarTramite,
+  borrarTramite,
+  borrarAllTramite,
+  buscarTramite,
+  cargarTramite,
+  crearTramite,
+  mostrarTramite
+
 }

@@ -2,91 +2,88 @@ const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('../database/config'); 
 const fileUpload = require('express-fileupload');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
-class Server{
-    constructor(){
+class Server {
+    constructor() {
         this.app = express();
-        this.port = process.env.PORT;
+        this.port = process.env.PORT || 8080; // Puerto por defecto 8080
         this.usuariosPath = '/api/usuarios';
-        this.authPath     = '/api/auth';
-        this.uploadsPath     = '/api/uploads';
+        this.authPath = '/api/auth';
+        this.uploadsPath = '/api/uploads';
         this.tramiteControllerPath = '/api/tramiteController';
 
-        //Conectar a base de datos
+        // Conectar a base de datos
         this.conectarDB();
 
-        //Middleware
+        // Middlewares
         this.middlewares();
 
-        //Rutas de mi aplicacion
+        // Rutas de mi aplicación
         this.routes();
-
     }
 
-    async conectarDB(){
-        await dbConnection()
+    async conectarDB() {
+        await dbConnection();
     }
-    //Middleware: son funciones que le van añadir otra funcionalidad a un webserver
-    //Una funcion que siempre se va a ejecutar siempre que levantemos el servidor
-    //Se crea un metodo de Middleware
-    //use es la palabra clave de un middleware
-    middlewares(){
-        // const whitelist = ["http://localhost:5173"];
 
-        // const corsOptions = {
-        //     origin: function (origin, callback) {
-        //     //   console.log(origin);
-        //       if (whitelist.includes(origin)) {
-        //         // Puede consultar la API
-        //         callback(null, true);
-        //       } else {
-        //         // No esta permitido
-        //         callback(new Error("Error de Cors"));
-        //       }
-        //     },
-        //   };
+    // Middleware de CORS y otros middlewares
+    middlewares() {
+        const whitelist = ["http://localhost:5173"];
 
-        //CORD
-        this.app.use( cors() );  //(corsOptions)
+        const corsOptions = {
+            origin: function (origin, callback) {
+                if (whitelist.includes(origin) || !origin) {
+                    // Permitir el acceso desde el origen de la solicitud o si no se proporciona un origen (para peticiones locales)
+                    callback(null, true);
+                } else {
+                    // Configurar una respuesta con código 403 Forbidden para rechazar las solicitudes no permitidas
+                    const error = new Error("Acceso no permitido desde este origen");
+                    error.status = 403;
+                    callback(error);
+                }
+            },
+            credentials: true, // Permitir el envío de credenciales (por ejemplo, cookies) desde el cliente
+        };
 
-        //Cokies 
+        // CORS
+        this.app.use(cors(corsOptions));
+
+        // Cookies 
         this.app.use(cookieParser());
 
-        //Lectura y parseo del body
-        this.app.use( express.json() );
+        // Lectura y parseo del body
+        this.app.use(express.json());
 
-        //Se hace la l  lamada al directorio publico
-        this.app.use( express.static('public'));
+        // Se hace la llamada al directorio público
+        this.app.use(express.static('public'));
 
-         //Maneja Fileupload - Carga de archivos
-         this.app.use(fileUpload({
-             useTempFiles : true,
-             tempFileDir : '/tmp/'
-         }));
-
+        // Maneja Fileupload - Carga de archivos
+        this.app.use(fileUpload({
+            useTempFiles: true,
+            tempFileDir: '/tmp/'
+        }));
     }
 
-    //Este es un metodo por lo no tengo haceeso y tengo que usuar la misma sintaxis de mi contructor
-    routes(){
-        //Vamos a usar un middleware para otorgarle ciertas rutas
-        //Conte middleware se llama ak archivo donde tenemos las rutas
-        this.app.use(this.authPath,     require('../routes/authRoutes'));
+    // Definición de las rutas
+    routes() {
+        // Vamos a usar un middleware para otorgarle ciertas rutas
+        // Contiene middleware se llama al archivo donde tenemos las rutas
+        this.app.use(this.authPath, require('../routes/authRoutes'));
         this.app.use(this.usuariosPath, require('../routes/usuarios'));
-        this.app.use(this.uploadsPath,      require('../routes/uploads'));
-        this.app.use(this.tramiteControllerPath, require('../routes/tramiteRoutes'))
-    
+        this.app.use(this.uploadsPath, require('../routes/uploads'));
+        this.app.use(this.tramiteControllerPath, require('../routes/tramiteRoutes'));
+
         // Middleware para manejar rutas no reconocidas
         this.app.use((req, res) => {
             res.status(404).json({ error: 'Ruta no encontrada' });
         });
     }
 
- 
-    //Ahora vamos a crear un metodo para mis rutas
-    listen(){
-        this.app.listen(this.port, () =>{
-            console.log('Servidor correindo en puerto', this.port);
+    // Método para iniciar el servidor
+    listen() {
+        this.app.listen(this.port, () => {
+            console.log('Servidor corriendo en puerto', this.port);
         });
     }
 }

@@ -6,13 +6,13 @@ const TramiteSchema = Schema ({
     {
       nombre: {
         type: String, 
-        maxlength: [250, "El maximo de caracteres es: 250"],
+        // maxlength: [250, "El maximo de caracteres es: 550"],
         required: [true, "El campo nombre es requerido"],
         trim: true
       },
       valor: {
         type: String,
-        maxlength: [250, "El maximo de caracteres es: 250"],
+        // maxlength: [250, "El maximo de caracteres es: 550"],
         trim: true,
         default: null 
       }

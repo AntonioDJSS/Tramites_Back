@@ -7,36 +7,32 @@ const generarId = require("../helpers/generarId");
 const {emailOlvidePassword} = require('../helpers/email')
 const {emailRegistro} = require('../helpers/email')
 
-const createSendToken = async (usuario, statusCode,req,res) =>{
-    //Generar el JWT
-    const token = await generarJWT( usuario.id );
-    //Las cookies sirven para que el navegador no pueda modicar ni acceder a la cookie que mandaremos
-    //Un cookie es un pequeño fragmento de texto
-    const cookieOptions ={
-        //Fecha en milisegundos
-        secure: true,
-        //secure:  req.secure || req.headers['x-forwarded-proto'] === 'https',
-        expires: new Date (
-        Date.now () + 5 * 24 * 60 * 60 * 1000
-        ),
-        sameSite: 'none',
-    }
+const createSendToken = async (usuario, statusCode, req, res) => {
+    // Generar el JWT
+    const token = await generarJWT(usuario.id);
+
+    // Las cookies sirven para que el navegador no pueda modificar ni acceder a la cookie que mandaremos
+    // Un cookie es un pequeño fragmento de texto
+    const cookieOptions = {
+        // Fecha en milisegundos (5 días)
+        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+        // Ajuste para desarrollo local (usando HTTP)
+        // En producción, considera cambiar esto a 'none' si se requiere acceso entre diferentes dominios (frontend y backend en dominios distintos)
+        sameSite: 'lax',
+    };
+
     // usuario.contraseña = undefined;
-    res.cookie('jwt',token,cookieOptions);
-  
-    /*res.cookie('checkToken', true, {
-        secure:  req.secure || req.headers['x-forwarded-proto'] === 'https', 
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN *24 *60 *60*1000),
-      }) */
-      
+    res.cookie('jwt', token, cookieOptions);
+
     res.status(statusCode).json({
         status: "successful",
         token,
         usuario,
-        msg: "Inicio de Sesion Correctamente",
+        msg: "Inicio de Sesión Correctamente",
         checkToken: true
-    })
-}
+    });
+};
+
 
 const login = async(req, res = response) =>{
     const { correo, password } = req.body;
