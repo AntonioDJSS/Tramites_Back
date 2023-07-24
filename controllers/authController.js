@@ -1,4 +1,4 @@
-const { response, json } = require("express");
+const { response } = require("express");
 const bcryptjs = require('bcryptjs');
 const  Usuario  = require('../models/usuario');
 const { generarJWT } = require("../helpers/generar-jwt");
@@ -11,17 +11,13 @@ const createSendToken = async (usuario, statusCode, req, res) => {
     // Generar el JWT
     const token = await generarJWT(usuario.id);
 
-    // Las cookies sirven para que el navegador no pueda modificar ni acceder a la cookie que mandaremos
-    // Un cookie es un pequeño fragmento de texto
+    // Configurar las opciones de la cookie
     const cookieOptions = {
-        // Fecha en milisegundos (5 días)
-        expires: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-        // Ajuste para desarrollo local (usando HTTP)
-        // En producción, considera cambiar esto a 'none' si se requiere acceso entre diferentes dominios (frontend y backend en dominios distintos)
-        sameSite: 'lax',
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 
+        httpOnly: true, // La cookie no puede ser accedida desde JavaScript
     };
 
-    // usuario.contraseña = undefined;
+    // Configura la cookie
     res.cookie('jwt', token, cookieOptions);
 
     res.status(statusCode).json({
