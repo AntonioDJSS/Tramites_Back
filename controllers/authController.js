@@ -21,7 +21,7 @@ const createSendToken = async (usuario, statusCode, req, res) => {
     res.cookie('jwt', token, cookieOptions);
 
     res.status(statusCode).json({
-        status: "successful",
+        status: "success",
         token,
         usuario,
         msg: "Inicio de Sesión Correctamente",
@@ -37,12 +37,14 @@ const login = async(req, res = response) =>{
         const usuario =  await Usuario.findOne({ correo });
         if (!usuario) {
             return res.status(400).json({
+                status: "error",
                 msg: 'Usuario / Password no son correctos - correo'
             });
         }
         //Si el usuario esta activo
         if ( !usuario.estado) {
             return res.status(400).json({
+                status: "error",
                 msg: 'Tu cuenta no ha sido confirmada'
             })
         }
@@ -50,15 +52,17 @@ const login = async(req, res = response) =>{
         const valiPassword = bcryptjs.compareSync( password, usuario.password);
         if (!valiPassword) {
             return res.status(400).json({
+                status: "error",
                 msg: 'Usuario / Password no son correctos - password'
             });
         }
         //Enviar un JWT al cliente
     createSendToken(usuario,200,req,res);
     } catch (error) {
-        console.log(error)
         return res.status(500).json({
-            msg: 'Hable con el administrador'
+            status: "error",
+            msg: 'Hable con el administrador',
+            error: error.msg
         });
     }
 }
@@ -80,13 +84,16 @@ const registrar = async (req, res) => {
         token: usuario.token,
       });
   
-      res.json({
-        usuario
+      res.status(200).json({
+        status: 'success',
+        data: usuario
       });
     } catch (error) {
       // Manejo de errores
       res.status(500).json({
-        msg: 'No se puede registrar el Usuario'
+        status: "error",
+        msg: 'No se puede registrar el Usuario',
+        error: error.msg
       });
     }
 };
@@ -98,7 +105,7 @@ const cerrarSesion = async (req, res) =>{
          sameSite: 'none',
      });
      res.status(200).json({
-         status: 'successful'
+         status: 'success'
      })
 }
 
@@ -114,10 +121,14 @@ const confirmar = async(req, res = response) =>{
         usuarioConfirmar.estado = true;
         usuarioConfirmar.token = "";
         await usuarioConfirmar.save();
-        res.json({ msg: "Usuario Confirmado Correctamente "});
+        res.status(200).json({ 
+            status: 'success',
+            msg: "Usuario Confirmado Correctamente "});
     } catch (error) {
         res.status(500).json({
-            msg: 'No se pudo confirmar el Usuario'
+            status: "error",
+            msg: 'No se pudo confirmar el Usuario',
+            error: error.msg
           });
     }
 }
@@ -127,7 +138,9 @@ const olvidePassword = async (req, res = response ) =>{
      const usuario = await Usuario.findOne({ correo });
      if (!usuario) {
          const error = new Error ("El usuario no existe");
-         return res.status(404).json({ msg: error.message})
+         return res.status(404).json({ 
+            status: "error",
+            msg: error.message})
      }
      try {
         usuario.token = generarId();
@@ -139,10 +152,14 @@ const olvidePassword = async (req, res = response ) =>{
             token: usuario.token,
         })
 
-        res.json({ msg: "Hemos enviado un email con las instrucciones"})
+        res.status(200).json({
+            status: 'success', 
+            msg: "Hemos enviado un email con las instrucciones"})
      } catch (error) {
         res.status(500).json({
-            msg: 'Hubo un error en el servidor al enviar el email'
+            status: "error",
+            msg: 'Hubo un error en el servidor al enviar el email',
+            error: error.msg
           });
      }
     
@@ -155,15 +172,21 @@ const comprobarToken = async (req, res= response ) =>{
         const tokenValido = await Usuario.findOne({ token });
     
         if (tokenValido) {
-            res.json({ msg: "Token válido y el Usuario existe" });
+            res.status(200).json({ 
+                status: 'success',
+                msg: "Token válido y el Usuario existe" });
         } else {
             const error = new Error("Token no válido");
-            return res.status(404).json({ msg: error.message });
+            return res.status(404).json({ 
+                status: "error",
+                msg: error.message });
         }
     } catch (error) {
         // Aquí se captura cualquier error que ocurra durante la ejecución del código dentro del bloque try
         return res.status(500).json({ 
-            msg: "Error al comprobar el token" });
+            status: "error",
+            msg: "Error al comprobar el token",
+            error: error.msg });
     }
 };
 
@@ -178,14 +201,19 @@ const nuevoPassword = async (req, res = response) =>{
         usuario.token = "";
         try {
             await usuario.save();
-            res.json({ msg: "Password Modificado Correctamente" })
+            res.status(200).json({
+                status: 'success',
+                msg: "Password Modificado Correctamente" })
         } catch (error) {
             return res.status(500).json({ 
+                status: "error",
                 msg: "El Password no se pudo Modificar" });
         }
     } else {
         const error = new Error("Token no válido");
-        return res.status(404).json({ msg: error.message});
+        return res.status(404).json({ 
+            status: "error",
+            msg: error.message});
     }
 }
 

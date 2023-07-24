@@ -1,4 +1,5 @@
 const { Router } = require("express")
+const {check} = require('express-validator');
 const { actualizarTramite,
         buscarTramite,
         crearTramite,
@@ -6,16 +7,65 @@ const { actualizarTramite,
         borrarTramite,
         borrarAllTramite,
         cargarTramite } = require('../controllers/tramiteController')
+const { protect } = require ('../middlewares/auth-validar')
+const { esAdminRole, tieneRole } = require('../middlewares/validar-roles');
+const { validarCampos } = require('../middlewares/validar-campos');
 
 const router = Router();
 
-router.route('/:id').put(actualizarTramite)
-router.route('/:id').delete(borrarTramite)
-router.route('/borrar/all').delete(borrarAllTramite)
-router.route('/buscarT').get(buscarTramite)
-router.route('/cargarArchivo').post(cargarTramite)
-router.route('/').post(crearTramite)
-router.route('/').get(mostrarTramite)
+
+
+
+router.get('/buscarT',[
+    protect,
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    validarCampos
+],buscarTramite);
+
+router.get('/',[
+    protect,
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    validarCampos
+], mostrarTramite)
+
+//Protegidas ADMIN
+
+router.put('/:id',[
+    protect,
+    esAdminRole,       //Valida que el req.usuario sea admin para darle acceso
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    check('id','No es un ID válido').isMongoId(),
+    validarCampos
+],actualizarTramite);
+
+router.delete('/:id',[
+    protect,
+    esAdminRole,       //Valida que el req.usuario sea admin para darle acceso
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    check('id','No es un ID válido').isMongoId(),
+    validarCampos
+],borrarTramite);
+
+router.delete('/borrar/all',[
+    protect,
+    esAdminRole,       //Valida que el req.usuario sea admin para darle acceso
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    validarCampos
+],borrarAllTramite);
+
+router.post('/cargarArchivo',[
+    protect,
+    esAdminRole,       //Valida que el req.usuario sea admin para darle acceso
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    validarCampos
+],cargarTramite);
+
+router.post('/',[
+    protect,
+    esAdminRole,       //Valida que el req.usuario sea admin para darle acceso
+    tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
+    validarCampos
+],crearTramite);
 
 
 module.exports =  router;

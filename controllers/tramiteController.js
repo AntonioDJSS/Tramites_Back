@@ -11,7 +11,9 @@ const actualizarTramite = async (req, res) => {
   try {
     const tramite = await Tramite.findOne({ _id: id });
     if (!tramite) {
-      return res.status(404).json({ msg: 'Tramite no encontrado' });
+      return res.status(404).json({
+        status: "error",
+        msg: 'Tramite no encontrado' });
     }
 
     const tramiteActualizado = tramite.toObject(); // Convertir a objeto JavaScript
@@ -35,11 +37,13 @@ const actualizarTramite = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      tramite: tramiteActualizadoDB
+      data: tramiteActualizadoDB
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: 'Error al actualizar el tramite' });
+    res.status(500).json({ 
+      status: "error",
+      msg: 'Error al actualizar el tramite',
+      error: error.msg });
   }
 };
 
@@ -49,15 +53,22 @@ const borrarTramite = async (req, res) => {
   try {
     const tramite = await Tramite.findOne({ _id: id });
     if (!tramite) {
-      return res.status(404).json({ msg: 'Tramite no encontrado' });
+      return res.status(404).json({ 
+        status: "error",
+        msg: 'Tramite no encontrado' });
     }
     tramite.tramites = tramite.tramites.filter((t) => t._id.toString() !== id);
     // Guardar los cambios utilizando la función `updateOne` de Mongoose
     await Tramite.deleteOne({ _id: id }, { tramites: tramite.tramites });
-    res.status(200).json({ msg: 'Tramite eliminado correctamente' });
+    res.status(200).json({ 
+      status: 'success',
+      msg: 'Tramite eliminado correctamente' });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: 'Error al eliminar el tramite' });
+    res.status(500).json({ 
+      status: "error",
+      msg: 'Error al eliminar el tramite',
+      error: error.msg });
   }
 };
 
@@ -67,6 +78,7 @@ const borrarAllTramite = async (req, res) => {
 
     if (tramites.length === 0) {
       return res.status(404).json({
+        status: "error",
         msg: 'No existe ningún trámite'
       });
     }
@@ -78,8 +90,11 @@ const borrarAllTramite = async (req, res) => {
       msg: 'Se han eliminado todos los trámites'
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: 'Error al eliminar todos los trámites' });
+    res.status(500).json({ 
+      status: "error",
+      msg: 'Error al eliminar todos los trámites',
+      error: error.msg });
+      
   }
 };
 
@@ -108,14 +123,14 @@ const buscarTramite = async (req, res) => {
       .limit(limitNumber);
     res.status(200).json({
       status: 'success',
-      page: pageNumber,
-      limit: limitNumber,
-      total: tramites.length,
-      tramites,
+      data: tramites,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: 'Error al buscar el trámite' });
+    res.status(500).json({ 
+      status: "error",
+      msg: 'Error al buscar el trámite',
+      error: error.msg });
   }
 };
 
@@ -123,7 +138,9 @@ const cargarTramite = async (req, res) => {
   try {
     // Verificamos si se ha enviado un archivo
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
-      return res.status(400).json({ error: 'No hay archivos que subir' });
+      return res.status(400).json({
+        status: "error", 
+        msg: 'No hay archivos que subir' });
     }
 
     const { archivo } = req.files;
@@ -134,7 +151,9 @@ const cargarTramite = async (req, res) => {
     const extensionesValidas = ['xlsx'];
     if (!extensionesValidas.includes(extension)) {
       return res.status(400).json({
-        error: `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
+        status: "error",
+        msg: `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
+        
       });
     }
 
@@ -144,8 +163,11 @@ const cargarTramite = async (req, res) => {
     // Mover el archivo a la ubicación temporal
     archivo.mv(uploadPath, async (err) => {
       if (err) {
-        console.log(err);
-        return res.status(500).json({ error: 'Error al mover el archivo' });
+        
+        return res.status(500).json({ 
+          status: "error",
+          msg: 'Error al mover el archivo',
+          error: err.msg });
       }
 
       try {
@@ -188,7 +210,10 @@ const cargarTramite = async (req, res) => {
             const nuevoTramite = new Tramite({ tramites: tramite });
             await nuevoTramite.save();
           } catch (error) {
-            console.log('Error al guardar el tramite:', error);
+            res.status(500).json({
+              status: "error",
+              msg: 'Error al guardar el tramite',
+              error: error.msg});
             // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
           }
         }
@@ -201,13 +226,18 @@ const cargarTramite = async (req, res) => {
           msg: 'File uploaded and processed successfully',
         });
       } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'Error al leer el archivo Excel o guardar en la base de datos' });
+        res.status(500).json({ 
+          status: "error",
+          msg: 'Error al leer el archivo Excel o guardar en la base de datos',
+          error: error.msg });
+          
       }
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Error al cargar el trámite' });
+    res.status(500).json({ 
+      status: "error",
+      msg: 'Error al cargar el trámite',
+      error: error.msg });
   }
 };
 
@@ -223,8 +253,8 @@ const crearTramite = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: "Error al crear el trámite",
-      error: error.message,
+      msg: "Error al crear el trámite",
+      error: error.msg
     });
   }
 };
@@ -247,7 +277,9 @@ const mostrarTramite = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      status: "error",
       msg: "Error al mostrar los registros",
+      error: error.msg
     });
   }
 };

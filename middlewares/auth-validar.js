@@ -18,7 +18,9 @@ const protect = async ( req, res, next) =>{
       token = req.cookies.jwt;
       // console.log(req.cookie)
     }
-    if (!token) return res.status(401).send("Tu no has iniciado sesión, por favor inicia sesión para obtener el acceso");
+    if (!token) return res.status(401).json({ 
+      status: "error",
+      msg: "Tu no has iniciado sesión, por favor inicia sesión para obtener el acceso" });
     
     try {
       //2) Verificar si el token es válido
@@ -27,7 +29,7 @@ const protect = async ( req, res, next) =>{
       //3) Verificar si el usuario existe
       const usuario = await Usuario.findById(decoded.uid)
     
-      if (!usuario) return res.status(404).send("El usuario que pertenece a este token ya no existe");
+      if (!usuario) return res.status(404).json({ msg: "El usuario que pertenece a este token ya no existe"});
     
       //ACCESO A LA RUTA
       req.usuario = usuario;
@@ -35,7 +37,10 @@ const protect = async ( req, res, next) =>{
       
       next();
     } catch (error) {
-      return res.status(401).send("Token inválido");
+      return res.status(401).json({
+        status: "error",
+        msg: "Token inválido",
+        error: error.msg });
     }
 
 }
