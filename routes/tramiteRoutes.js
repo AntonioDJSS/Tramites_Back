@@ -28,6 +28,8 @@ router.get('/',[
     validarCampos
 ], mostrarTramite)
 
+
+
 //Protegidas ADMIN
 
 router.put('/:id',[

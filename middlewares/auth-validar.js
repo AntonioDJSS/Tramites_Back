@@ -31,9 +31,10 @@ const protect = async ( req, res, next) =>{
     
       if (!usuario) return res.status(404).json({ msg: "El usuario que pertenece a este token ya no existe"});
     
+      
       //ACCESO A LA RUTA
       req.usuario = usuario;
-
+      
       
       next();
     } catch (error) {

@@ -10,9 +10,11 @@ const { cerrarSesion,
         nuevoPassword,
         registrar
         } = require('../controllers/authController');
-const { deleteMe, 
+const { actualPassword,
+        actualizarUsuario,
+        deleteMe, 
         getMe, 
-        oneUser} = require('../controllers/usuarioControler')
+        oneUser} = require('../controllers/usuarioController')
 
 const { validarCampos } = require('../middlewares/validar-campos');
 const bcryptjs = require('bcryptjs');
@@ -64,8 +66,20 @@ router.post('/google',[
 //configura req.usuario con la información del usuario. Luego, el middleware getMe verifica que req.usuario esté configurado 
 //y extrae el id del usuario para que esté disponible en la consulta de la base de datos realizada por el middleware oneUser. 
 //Finalmente, oneUser busca el documento del usuario por el id y devuelve una respuesta JSON con el resultado.
+router.post('/actual-password',[
+    protect,
+    check('password','El password debe de ser más de 6 letras').isLength({ min: 6}),
+    validarCampos
+], actualPassword)
+
+router.put('/',[
+    protect
+], actualizarUsuario)
+
 router.route('/me').get(protect, getMe, oneUser);
 router.route('/deleteMe').delete(protect,deleteMe);
+
+
 // router.route('/updateMe').patch(uploadUserPhoto,tamañoPhotoUser,updateMe);
 
 

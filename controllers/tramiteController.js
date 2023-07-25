@@ -3,7 +3,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const xlsx = require('xlsx');
 const fs = require('fs');
-
+const mongoose = require('mongoose');
 
 const actualizarTramite = async (req, res) => {
   const { id } = req.params;
@@ -98,8 +98,11 @@ const borrarAllTramite = async (req, res) => {
   }
 };
 
+// Reemplaza esto:
+// const mongoose = require('mongoose');
+//Lo busca por Id
 const buscarTramite = async (req, res) => {
-  const { nombre, valor, page, limit } = req.query;
+  const { nombre, id, valor, page, limit } = req.query;
   try {
     // Creamos un objeto de consulta
     const query = {};
@@ -111,6 +114,11 @@ const buscarTramite = async (req, res) => {
     if (valor) {
       query['tramites.valor'] = { $regex: valor, $options: 'i' };
     }
+
+    if (id) {
+      query['_id'] = id; // Asignamos el valor del parámetro 'id' a la consulta para buscar el trámite por su _id específico
+    }
+
     // Convertir los parámetros de paginación y límite a números enteros
     const pageNumber = parseInt(page) || 1;
     const limitNumber = parseInt(limit) || 10; // Si no se proporciona 'limit', se asume un límite predeterminado de 10 registros por página
@@ -134,13 +142,15 @@ const buscarTramite = async (req, res) => {
   }
 };
 
+//Ya nada mas lee el archivo
 const cargarTramite = async (req, res) => {
   try {
     // Verificamos si se ha enviado un archivo
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
       return res.status(400).json({
-        status: "error", 
-        msg: 'No hay archivos que subir' });
+        status: "error",
+        msg: 'No hay archivos que subir'
+      });
     }
 
     const { archivo } = req.files;
@@ -153,91 +163,67 @@ const cargarTramite = async (req, res) => {
       return res.status(400).json({
         status: "error",
         msg: `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
-        
       });
     }
 
-    const nombreTemp = uuidv4() + '.' + extension;
-    const uploadPath = path.join(__dirname, '../uploads/', nombreTemp);
+    // Leer el archivo a través del buffer
+    const workbook = xlsx.read(archivo.data, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
 
-    // Mover el archivo a la ubicación temporal
-    archivo.mv(uploadPath, async (err) => {
-      if (err) {
-        
-        return res.status(500).json({ 
-          status: "error",
-          msg: 'Error al mover el archivo',
-          error: err.msg });
-      }
-
-      try {
-        // Leer el archivo a través del buffer
-        const workbook = xlsx.readFile(uploadPath);
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-
-        // Convertir los datos a JSON incluyendo celdas vacías con valor null
-        const jsonData = xlsx.utils.sheet_to_json(worksheet, {
-          raw: false,
-          defval: null,
-        });
-
-        // Procesar los datos (limpiar espacios) y guardarlos en el arreglo tramites
-        const tramites = [];
-        for (const row of jsonData) {
-          const tramite = []; // Crear un nuevo arreglo para cada fila
-          const keys = Object.keys(row);
-          for (const key of keys) {
-            let value = row[key];
-            // Convertir el valor a una cadena de texto antes de usar 'trim()'
-            value = String(value);
-            const cleanValue = value.trim() !== '' ? value.trim() : null; // Si está vacío, asignar null
-
-            // Verificar que el campo nombre tenga un valor antes de agregarlo al arreglo tramite
-            if (key.trim() !== '') {
-              tramite.push({ nombre: key, valor: cleanValue });
-            }
-          }
-          // Agregar el arreglo de la fila al arreglo principal tramites
-          tramites.push(tramite);
-
-        }
-        // console.log(tramites)
-
-        // Crear un documento de Tramite con los datos procesados y guardarlo en la base de datos
-        for (const tramite of tramites) {
-          try {
-            const nuevoTramite = new Tramite({ tramites: tramite });
-            await nuevoTramite.save();
-          } catch (error) {
-            res.status(500).json({
-              status: "error",
-              msg: 'Error al guardar el tramite',
-              error: error.msg});
-            // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
-          }
-        }
-        // Liberar el archivo temporal
-        fs.unlinkSync(uploadPath);
-
-        res.status(200).json({
-          status: 'success',
-          data: tramites,
-          msg: 'File uploaded and processed successfully',
-        });
-      } catch (error) {
-        res.status(500).json({ 
-          status: "error",
-          msg: 'Error al leer el archivo Excel o guardar en la base de datos',
-          error: error.msg });
-          
-      }
+    // Convertir los datos a JSON incluyendo celdas vacías con valor null
+    const jsonData = xlsx.utils.sheet_to_json(worksheet, {
+      raw: false,
+      defval: null,
     });
+
+    // Procesar los datos (limpiar espacios) y guardarlos en el arreglo tramites
+    const tramites = [];
+    for (const row of jsonData) {
+      const tramite = []; // Crear un nuevo arreglo para cada fila
+      const keys = Object.keys(row);
+      for (const key of keys) {
+        let value = row[key];
+        // Convertir el valor a una cadena de texto antes de usar 'trim()'
+        value = String(value);
+        const cleanValue = value.trim() !== '' ? value.trim() : null; // Si está vacío, asignar null
+
+        // Verificar que el campo nombre tenga un valor antes de agregarlo al arreglo tramite
+        if (key.trim() !== '') {
+          tramite.push({ nombre: key, valor: cleanValue });
+        }
+      }
+      // Agregar el arreglo de la fila al arreglo principal tramites
+      tramites.push(tramite);
+    }
+
+    // Crear un documento de Tramite con los datos procesados y guardarlo en la base de datos
+    for (const tramite of tramites) {
+      try {
+        const nuevoTramite = new Tramite({ tramites: tramite });
+        await nuevoTramite.save();
+      } catch (error) {
+        res.status(500).json({
+          status: "error",
+          msg: 'Error al guardar el tramite',
+          error: error.msg
+        });
+        // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
+      }
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: tramites,
+      msg: 'File uploaded and processed successfully',
+    });
+
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       status: "error",
       msg: 'Error al cargar el trámite',
-      error: error.msg });
+      error: error.msg
+    });
   }
 };
 
