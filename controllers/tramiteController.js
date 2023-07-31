@@ -8,16 +8,36 @@ const mongoose = require('mongoose');
 const actualizarTramite = async (req, res) => {
   const { id } = req.params;
   const nuevosTramites = req.body.tramites;
+
+  let tramite = null;
+
   try {
-    const tramite = await Tramite.findOne({ _id: id });
+    tramite = await Tramite.findOne({ _id: id });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al realizar la busqueda en la BD',
+      ex.message,
+      []).responseApiError();
+
+    res.status(404).json(
+      response
+    )
+  }
+  
     if (!tramite) {
-      return res.status(404).json({
-        status: "error",
-        msg: 'Tramite no encontrado' });
+      const response = new ResponseError(
+        'fail',
+        'Tramite no encontrado',
+        'No hay ningun tramite, porfavor asigna un tramite existente',
+        []).responseApiError();
+  
+      return res.status(404).json(
+        response
+      )
     }
 
     const tramiteActualizado = tramite.toObject(); // Convertir a objeto JavaScript
-
     tramiteActualizado.tramites = tramiteActualizado.tramites.map(
       (tramiteAnterior, index) => {
         const nuevoTramite = nuevosTramites[index];
@@ -29,72 +49,131 @@ const actualizarTramite = async (req, res) => {
       }
     );
 
+  try {
     const tramiteActualizadoDB = await Tramite.findOneAndUpdate(
       { _id: id },
       tramiteActualizado,
       { new: true }
     );
-
     res.status(200).json({
-      status: 'success',
-      data: tramiteActualizadoDB
+      status: 'successful',
+      data: tramiteActualizadoDB,
+      message: 'El tramite se ha actualizado'
     });
-  } catch (error) {
-    res.status(500).json({ 
-      status: "error",
-      msg: 'Error al actualizar el tramite',
-      error: error.msg });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al actualizar el tramite',
+      ex.message,
+      []).responseApiError();
+    
+    res.status(500).json(
+      response
+    )
   }
 };
 
 const borrarTramite = async (req, res) => {
   const { id } = req.params;
 
+  let tramite = null;
+
   try {
-    const tramite = await Tramite.findOne({ _id: id });
-    if (!tramite) {
-      return res.status(404).json({ 
-        status: "error",
-        msg: 'Tramite no encontrado' });
-    }
+    tramite = await Tramite.findOne({ _id: id });    
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al realizar la busqueda en la BD',
+      ex.message,
+      []).responseApiError();
+
+    res.status(404).json(
+      response
+    )
+  }
+
+  if (!tramite) {
+    const response = new ResponseError(
+      'fail',
+      'Tramite no encontrado',
+      'No hay ningun tramite, porfavor asigna un tramite existente',
+      []).responseApiError();
+
+    return res.status(404).json(
+      response
+    )
+  }
+
+  try {
+   
     tramite.tramites = tramite.tramites.filter((t) => t._id.toString() !== id);
     // Guardar los cambios utilizando la función `updateOne` de Mongoose
     await Tramite.deleteOne({ _id: id }, { tramites: tramite.tramites });
     res.status(200).json({ 
       status: 'success',
-      msg: 'Tramite eliminado correctamente' });
+      message: 'Tramite eliminado correctamente' });
 
-  } catch (error) {
-    res.status(500).json({ 
-      status: "error",
-      msg: 'Error al eliminar el tramite',
-      error: error.msg });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al eliminar el tramite',
+      ex.message,
+      []).responseApiError();
+    
+    res.status(500).json(
+      response
+    )
   }
 };
 
 const borrarAllTramite = async (req, res) => {
+
+  let tramites = null;
+
   try {
-    const tramites = await Tramite.find();
+    tramites = await Tramite.find();
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'No se encontro ningun trámite',
+      ex.message,
+      []).responseApiError();
+    res.status(500).json(
+      response
+    )
+  }
+  
 
-    if (tramites.length === 0) {
-      return res.status(404).json({
-        status: "error",
-        msg: 'No existe ningún trámite'
-      });
-    }
+  if (tramites.length === 0) {
+    const response = new ResponseError(
+      'fail',
+      'No existe ningún trámite',
+      'No se encuentra ningun trámite, porfavor revisa la busqueda',
+      []).responseApiError();
 
+    return res.status(404).json(
+      response
+    )
+  }
+
+  try {
+    
     await Tramite.deleteMany();
 
     res.status(200).json({
-      status: 'success',
-      msg: 'Se han eliminado todos los trámites'
+      status: 'successful',
+      message: 'Se han eliminado todos los trámites'
     });
-  } catch (error) {
-    res.status(500).json({ 
-      status: "error",
-      msg: 'Error al eliminar todos los trámites',
-      error: error.msg });
-      
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al eliminar todos los trámites',
+      ex.message,
+      []).responseApiError();
+
+    res.status(500).json(
+      response
+    ) 
   }
 };
 
@@ -103,54 +182,65 @@ const borrarAllTramite = async (req, res) => {
 //Lo busca por Id
 const buscarTramite = async (req, res) => {
   const { nombre, id, valor, page, limit } = req.query;
+
+  // Creamos un objeto de consulta
+  const query = {};
+  // Si el parámetro 'nombre' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'nombre' del array 'tramites'
+  if (nombre) {
+    query['tramites.nombre'] = { $regex: nombre, $options: 'i' };
+  }
+  // Si el parámetro 'valor' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'valor' del array 'tramites'
+  if (valor) {
+    query['tramites.valor'] = { $regex: valor, $options: 'i' };
+  }
+
+  if (id) {
+    query['_id'] = id; // Asignamos el valor del parámetro 'id' a la consulta para buscar el trámite por su _id específico
+  }
+
+  // Convertir los parámetros de paginación y límite a números enteros
+  const pageNumber = parseInt(page) || 1;
+  const limitNumber = parseInt(limit) || 10; // Si no se proporciona 'limit', se asume un límite predeterminado de 10 registros por página
+  // Calcular el número de registros para omitir y paginar correctamente los resultados
+  const skip = (pageNumber - 1) * limitNumber;
+
   try {
-    // Creamos un objeto de consulta
-    const query = {};
-    // Si el parámetro 'nombre' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'nombre' del array 'tramites'
-    if (nombre) {
-      query['tramites.nombre'] = { $regex: nombre, $options: 'i' };
-    }
-    // Si el parámetro 'valor' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'valor' del array 'tramites'
-    if (valor) {
-      query['tramites.valor'] = { $regex: valor, $options: 'i' };
-    }
-
-    if (id) {
-      query['_id'] = id; // Asignamos el valor del parámetro 'id' a la consulta para buscar el trámite por su _id específico
-    }
-
-    // Convertir los parámetros de paginación y límite a números enteros
-    const pageNumber = parseInt(page) || 1;
-    const limitNumber = parseInt(limit) || 10; // Si no se proporciona 'limit', se asume un límite predeterminado de 10 registros por página
-    // Calcular el número de registros para omitir y paginar correctamente los resultados
-    const skip = (pageNumber - 1) * limitNumber;
 
     // Realizar la búsqueda en la base de datos utilizando Mongoose con paginación y límite
     const tramites = await Tramite.find(query)
       .skip(skip)
       .limit(limitNumber);
     res.status(200).json({
-      status: 'success',
+      status: 'successful',
       data: tramites,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ 
-      status: "error",
-      msg: 'Error al buscar el trámite',
-      error: error.msg });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al buscar el trámite',
+      ex.message,
+      []).responseApiError();
+
+    res.status(500).json(
+      response
+    )
   }
 };
 
 //Ya nada mas lee el archivo
 const cargarTramite = async (req, res) => {
-  try {
+  
     // Verificamos si se ha enviado un archivo
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
-      return res.status(400).json({
-        status: "error",
-        msg: 'No hay archivos que subir'
-      });
+      const response = new ResponseError(
+        'fail',
+        'No hay archivos que subir',
+        'No se ha cargado ningun archivo, porfavor carga un archivo',
+        []).responseApiError();
+      
+      return res.status(400).json(
+        response
+      )
     }
 
     const { archivo } = req.files;
@@ -160,12 +250,19 @@ const cargarTramite = async (req, res) => {
     // Validar la extensión
     const extensionesValidas = ['xlsx'];
     if (!extensionesValidas.includes(extension)) {
-      return res.status(400).json({
-        status: "error",
-        msg: `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
-      });
+
+      const response = new ResponseError(
+        'fail',
+        `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
+        'La extencion con la que se cargo el archivo no es valida, coloca la correcta porfavor',
+        []).responseApiError();
+
+      return res.status(400).json(
+        response
+      )
     }
 
+    try {
     // Leer el archivo a través del buffer
     const workbook = xlsx.read(archivo.data, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
@@ -202,12 +299,17 @@ const cargarTramite = async (req, res) => {
       try {
         const nuevoTramite = new Tramite({ tramites: tramite });
         await nuevoTramite.save();
-      } catch (error) {
-        res.status(500).json({
-          status: "error",
-          msg: 'Error al guardar el tramite',
-          error: error.msg
-        });
+      } catch (ex) {
+
+        const response = new ResponseError(
+          'fail',
+          'Error al guardar el tramite',
+          ex.message,
+          []).responseApiError();
+
+        res.status(500).json(
+          response
+        )
         // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
       }
     }
@@ -215,33 +317,44 @@ const cargarTramite = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: tramites,
-      msg: 'File uploaded and processed successfully',
+      message: 'Se Cargaron Correctamente los Tramites',
     });
 
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      msg: 'Error al cargar el trámite',
-      error: error.msg
-    });
+  } catch (ex) {
+
+    const response = new ResponseError(
+      'fail',
+      'Error al cargar el trámite',
+      ex.message,
+      []).responseApiError();
+
+    res.status(500).json(
+      response
+    )
   }
 };
 
 
 const crearTramite = async (req, res) => {
+
+  const tramite = Tramite(req.body);
   try {
-    const tramite = Tramite(req.body);
     const response = await tramite.save();
     res.status(200).json({
-      status: "success",
+      status: "successful",
       data: response,
+      message: 'Tramite Creado Correctamente'
     });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      msg: "Error al crear el trámite",
-      error: error.msg
-    });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al crear el trámite',
+      ex.message,
+      []).responseApiError();
+
+    res.status(500).json(
+      response
+    )
   }
 };
 
@@ -250,23 +363,25 @@ const mostrarTramite = async (req, res) => {
     // Obtener los valores de page y limit del query string (si no se proporcionan, se utilizarán valores predeterminados)
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10; // Por ejemplo, 10 registros por página
-
     // Calcular el número de documentos que se deben omitir antes de mostrar los registros de la página actual
     const skip = (page - 1) * limit;
-
     // Realizar la consulta a la base de datos con el paginado
     const tramite = await Tramite.find().skip(skip).limit(limit);
-
     res.status(200).json({
-      status: "success",
+      status: "successful",
       data: tramite,
     });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      msg: "Error al mostrar los registros",
-      error: error.msg
-    });
+  } catch (ex) {
+
+    const response = new ResponseError(
+      'fail',
+      'Error al mostrar los registros',
+      ex.message,
+      []).responseApiError();
+
+    res.status(500).json(
+      response
+    )
   }
 };
 

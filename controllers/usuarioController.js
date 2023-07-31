@@ -6,52 +6,84 @@ const bcryptjs = require('bcryptjs');
 const actualPassword = async (req, res)  =>{
 
     const { password } = req.body;
-
     const usuario = req.usuario;
+
     if (usuario) {
         usuario.password = password;
+    }
+
+    try {
         const salt = bcryptjs.genSaltSync();
         usuario.password = bcryptjs.hashSync( password, salt);
+    } catch (ex) {
+        const response = new ResponseError(
+            'fail',
+            'Hubo un problema en el hash',
+            ex.message,          
+            []).responseApiError();
+        res.status(500).json(
+            response
+        )
     }
+
     try {
         await usuario.save();
         res.status(200).json({
             status: 'success',
-            msg: 'Password Modificado Correctamente'
+            message: 'Password Modificado Correctamente'
         })
-    } catch (error) {
-           return res.status(500).json({
-            status: "error",
-            msg: "El Password no se pudo Modificar"
-           })
+    } catch (ex) {
+        const response = new ResponseError(
+            'fail',
+            'El Password no se pudo Modificar',
+            ex.message,
+            []).responseApiError();
+
+        return res.status(500).json(
+            response
+        )
     }
 };
 
 const actualizarUsuario = async (req, res) => {
     const { nombre, correo } = req.body;
     const usuario = req.usuario;
+
+
     if (!usuario) {
-        return res.status(404).json({
-            msg: "Usuario no encontrado"
-        });
+        const response = new ResponseError(
+            'fail',
+            'Usuario no encontrado',
+            'El Usuario no se encontro al querer obtenerse',
+            []).responseApiError();
+        
+        return res.status(404).json(
+            response
+        )
+    }
+
+    if (nombre) {
+        usuario.nombre = nombre;
+    }
+    if (correo) {
+        usuario.correo = correo;
     }
     try {
-        if (nombre) {
-            usuario.nombre = nombre;
-        }
-        if (correo) {
-            usuario.correo = correo;
-        }
         await usuario.save();
         res.status(200).json({
-            status: 'success',
-            msg: "Usuario Actualizado Correctamente",
-            data: usuario
+            status: 'successful',
+            data: usuario,
+            message: "Usuario Actualizado Correctamente"
         });
-    } catch (error) {
-        return res.status(500).json({
-            msg: "No se puede Actualizar"
-        });
+    } catch (ex) {
+        const response = new ResponseError(
+            'fail',
+            'No se puede Actualizar',
+            ex.message,
+            []).responseApiError();
+        res.status(500).json(
+            response
+        )
     }
 }
 
@@ -68,9 +100,14 @@ const getMe = (req,res,next)=>{
    req.params.id = req.usuario.id;
 
    if (!req.params.id) {
-        return res.status(404).json({
-            msg: "El usuario por id no existe getMe"
-        })
+        const response = new ResponseError(
+            'fail',
+            'El usuario por id no existe getMe',
+            'El usuario no se encontro por el id',
+            []).responseApiError();
+        return res.status(404).json(
+            response
+        )
    }
   next();
 };

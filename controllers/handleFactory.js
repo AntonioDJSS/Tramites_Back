@@ -12,7 +12,7 @@ const getOne = (Model, populateOptions) => async (req, res, next) => {
       }
   
       res.status(200).json({
-        status: "success",
+        status: "successful",
         requestAt: req.requestTime,
         data: { data: doc },
       });
