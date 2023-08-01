@@ -1,46 +1,41 @@
-// Importar la biblioteca 'openai'
-const openai = require('openai');
+const axios = require('axios');
 
-
-// Definir la función 'chatgp3'
 const chatgp3 = async (req, res) => {
-  try {
-    // Obtener la pregunta del cuerpo de la solicitud
     const { pregunta } = req.body;
 
-     // Tu clave de API de OpenAI
-     const api_key = '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';
+    // Definir tu clave de API
+    const api_key = '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';
 
-     // Establecer la clave de API para la biblioteca
-     openai.api_key = api_key;
- 
-     // Configurar los parámetros para la solicitud a la API de OpenAI
-     const params = {
-       engine: 'text-davinci-003',
-       prompt: pregunta,
-       temperature: 0.7,
-       max_tokens: 150,
-     };
- 
-     // Realizar la solicitud a la API de OpenAI
-     const respuesta = await openai.Completion.create(params);
-    // Obtener la respuesta del resultado y extraer el texto
-    const respuesta_chatgpt = respuesta.data.choices[0].text.trim();
+    // Establecer el encabezado de autorización para la solicitud a la API
+    const headers = {
+        Authorization: `Bearer ${api_key}`,
+        'Content-Type': 'application/json'
+    };
 
-    // Responder con la respuesta del modelo ChatGPT
-    res.status(200).json({
-      status: 'successful',
-      respuesta: respuesta_chatgpt,
-    });
-  } catch (error) {
-    // Manejar cualquier error que pueda ocurrir durante la solicitud a la API
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-    });
-  }
+    try {
+        // Hacer una solicitud a la API de OpenAI para obtener la respuesta
+        const response = await axios.post('https://api.openai.com/v1/engines/text-davinci-003/completions', {
+            prompt: pregunta,
+            temperature: 0.7,
+            max_tokens: 150
+        }, { headers });
+
+        const respuesta_chatgpt = response.data.choices[0].text.trim();
+        
+        res.status(200).json({
+            status: 'successful',
+            respuesta: respuesta_chatgpt
+        });
+    } catch (error) {
+        // Manejar cualquier error que pueda ocurrir durante la solicitud a la API
+        console.error("Error:", error.message);
+        res.status(500).json({
+            status: 'error',
+            message: 'Error al procesar la solicitud.'
+        });
+    }
 };
 
 module.exports = {
-  chatgp3,
+    chatgp3
 };

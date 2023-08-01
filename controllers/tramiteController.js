@@ -3,7 +3,11 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const xlsx = require('xlsx');
 const fs = require('fs');
-const mongoose = require('mongoose');
+const ResponseError = require('../utils/ResponseError')
+const multer  = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({storage})
+const excel =  upload.single('archivo');
 
 const actualizarTramite = async (req, res) => {
   const { id } = req.params;
@@ -230,109 +234,113 @@ const buscarTramite = async (req, res) => {
 //Ya nada mas lee el archivo
 const cargarTramite = async (req, res) => {
   
-    // Verificamos si se ha enviado un archivo
-    if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
-      const response = new ResponseError(
-        'fail',
-        'No hay archivos que subir',
-        'No se ha cargado ningun archivo, porfavor carga un archivo',
-        []).responseApiError();
-      
-      return res.status(400).json(
-        response
-      )
-    }
-
-    const { archivo } = req.files;
-    const nombreCortado = archivo.name.split('.');
-    const extension = nombreCortado[nombreCortado.length - 1];
-
-    // Validar la extensión
-    const extensionesValidas = ['xlsx'];
-    if (!extensionesValidas.includes(extension)) {
-
-      const response = new ResponseError(
-        'fail',
-        `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
-        'La extencion con la que se cargo el archivo no es valida, coloca la correcta porfavor',
-        []).responseApiError();
-
-      return res.status(400).json(
-        response
-      )
-    }
-
-    try {
-    // Leer el archivo a través del buffer
-    const workbook = xlsx.read(archivo.data, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-
-    // Convertir los datos a JSON incluyendo celdas vacías con valor null
-    const jsonData = xlsx.utils.sheet_to_json(worksheet, {
-      raw: false,
-      defval: null,
-    });
-
-    // Procesar los datos (limpiar espacios) y guardarlos en el arreglo tramites
-    const tramites = [];
-    for (const row of jsonData) {
-      const tramite = []; // Crear un nuevo arreglo para cada fila
-      const keys = Object.keys(row);
-      for (const key of keys) {
-        let value = row[key];
-        // Convertir el valor a una cadena de texto antes de usar 'trim()'
-        value = String(value);
-        const cleanValue = value.trim() !== '' ? value.trim() : null; // Si está vacío, asignar null
-
-        // Verificar que el campo nombre tenga un valor antes de agregarlo al arreglo tramite
-        if (key.trim() !== '') {
-          tramite.push({ nombre: key, valor: cleanValue });
-        }
-      }
-      // Agregar el arreglo de la fila al arreglo principal tramites
-      tramites.push(tramite);
-    }
-
-    // Crear un documento de Tramite con los datos procesados y guardarlo en la base de datos
-    for (const tramite of tramites) {
-      try {
-        const nuevoTramite = new Tramite({ tramites: tramite });
-        await nuevoTramite.save();
-      } catch (ex) {
-
-        const response = new ResponseError(
-          'fail',
-          'Error al guardar el tramite',
-          ex.message,
-          []).responseApiError();
-
-        res.status(500).json(
-          response
-        )
-        // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
-      }
-    }
-
-    res.status(200).json({
-      status: 'success',
-      data: tramites,
-      message: 'Se Cargaron Correctamente los Tramites',
-    });
-
-  } catch (ex) {
-
+  // Verificamos si se ha enviado un archivo
+  if (!req.file ) {
     const response = new ResponseError(
       'fail',
-      'Error al cargar el trámite',
-      ex.message,
+      'No hay archivos que subir',
+      'No se ha cargado ningun archivo, porfavor carga un archivo',
       []).responseApiError();
-
-    res.status(500).json(
+    
+    return res.status(400).json(
       response
     )
   }
+
+  const  archivo  = req.file;
+  const nombreCortado = archivo.originalname.split('.');
+  const extension = nombreCortado[nombreCortado.length - 1];
+
+  // Validar la extensión
+  const extensionesValidas = ['xlsx'];
+  if (!extensionesValidas.includes(extension)) {
+
+    const response = new ResponseError(
+      'fail',
+      `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
+      'La extencion con la que se cargo el archivo no es valida, coloca la correcta porfavor',
+      []).responseApiError();
+
+    return res.status(400).json(
+      response
+    )
+  }
+
+  try {
+  // Leer el archivo a través del buffer
+  const workbook = xlsx.read(archivo.buffer, { type: 'buffer' });
+
+  const sheetName = workbook.SheetNames[0];
+ 
+  const worksheet = workbook.Sheets[sheetName];
+ 
+
+  // Convertir los datos a JSON incluyendo celdas vacías con valor null
+  const jsonData = xlsx.utils.sheet_to_json(worksheet, {
+    raw: false,
+    defval: null,
+  });
+  // Procesar los datos (limpiar espacios) y guardarlos en el arreglo tramites
+  const tramites = [];
+  for (const row of jsonData) {
+    const tramite = []; // Crear un nuevo arreglo para cada fila
+    const keys = Object.keys(row);
+    for (const key of keys) {
+      let value = row[key];
+      // Convertir el valor a una cadena de texto antes de usar 'trim()'
+      value = String(value);
+      const cleanValue = value.trim() !== '' ? value.trim() : null; // Si está vacío, asignar null
+
+      // Verificar que el campo nombre tenga un valor antes de agregarlo al arreglo tramite
+      if (key.trim() !== '') {
+        tramite.push({ nombre: key, valor: cleanValue });
+      }
+    }
+    // Agregar el arreglo de la fila al arreglo principal tramites
+    tramites.push(tramite);
+  }
+
+  // Crear un documento de Tramite con los datos procesados y guardarlo en la base de datos
+  for (const tramite of tramites) {
+    try {
+      const nuevoTramite = new Tramite({ tramites: tramite });
+      await nuevoTramite.save();
+    } catch (ex) {
+
+      const response = new ResponseError(
+        'fail',
+        'Error al guardar el tramite',
+        ex.message,
+        []).responseApiError();
+
+      res.status(500).json(
+        response
+      )
+      // Aquí puedes decidir cómo manejar los errores al guardar cada trámite
+    }
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: tramites,
+    message: 'Se Cargaron Correctamente los Tramites',
+  });
+
+} catch (ex) {
+
+  const response = new ResponseError(
+    'fail',
+    'Error al cargar el trámite',
+    ex.message,
+    []).responseApiError();
+
+  res.status(500).json(
+    response
+  )
+}
 };
+
+
 
 
 const crearTramite = async (req, res) => {
@@ -367,6 +375,7 @@ const mostrarTramite = async (req, res) => {
     const skip = (page - 1) * limit;
     // Realizar la consulta a la base de datos con el paginado
     const tramite = await Tramite.find().skip(skip).limit(limit);
+ 
     res.status(200).json({
       status: "successful",
       data: tramite,
@@ -392,6 +401,7 @@ module.exports = {
   buscarTramite,
   cargarTramite,
   crearTramite,
-  mostrarTramite
+  mostrarTramite,
+  excel
 
 }

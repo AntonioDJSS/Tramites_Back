@@ -16,8 +16,10 @@ class ResponseError {
 
     responseApiError = () => {
         return {
-            status, message, error, errors
+            status: this.status , message: this.message, error: this.error, errors: this.errors
         }
     }
 
 }
+
+module.exports = ResponseError;

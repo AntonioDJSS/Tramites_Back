@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('../database/config'); 
-const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 
 class Server {
@@ -58,11 +57,6 @@ class Server {
         // Se hace la llamada al directorio público
         this.app.use(express.static('public'));
 
-        // Maneja Fileupload - Carga de archivos
-        this.app.use(fileUpload({
-            useTempFiles: true,
-            tempFileDir: '/tmp/'
-        }));
     }
 
     // Definición de las rutas

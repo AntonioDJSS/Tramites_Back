@@ -6,7 +6,7 @@ const { actualizarTramite,
         mostrarTramite,
         borrarTramite,
         borrarAllTramite,
-        cargarTramite } = require('../controllers/tramiteController')
+        cargarTramite, excel } = require('../controllers/tramiteController')
 const { protect } = require ('../middlewares/auth-validar')
 const { esAdminRole, tieneRole } = require('../middlewares/validar-roles');
 const { validarCampos } = require('../middlewares/validar-campos');
@@ -60,7 +60,7 @@ router.post('/cargarArchivo',[
     esAdminRole,       //Valida que el req.usuario sea admin para darle acceso
     tieneRole('ADMIN_ROLE', 'USER_ROLE'), //Verifica que sea alguno de estos roles
     validarCampos
-],cargarTramite);
+],excel,cargarTramite);
 
 router.post('/',[
     protect,
