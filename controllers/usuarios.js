@@ -7,13 +7,14 @@ const Usuario = require('../models/usuario');
 
 //Aqui lo que se maneja es la url en parametros
 const usuariosGet = async (req = request, res = response) => {
-  try {
+  
     const { limit = 4, page = 1 } = req.query;
     const parsedLimit = parseInt(limit);
     const parsedPage = parseInt(page);
     const skip = (parsedPage - 1) * parsedLimit;
     const query = { estado: true };
 
+  try {
     const [total, usuarios] = await Promise.all([
       Usuario.countDocuments(query),
       Usuario.find(query)
@@ -21,22 +22,27 @@ const usuariosGet = async (req = request, res = response) => {
         .limit(parsedLimit)
     ]);
 
-    res.json({
+    res.status(200).json({
+      status: 'successful',
       total,
-      usuarios
+      data: usuarios,
+      message: 'Usuarios Registrados'
     });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      msg: 'No se pudieron mostrar los usuarios'
-    });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'No se pudieron mostrar los usuarios',
+      ex.message,
+      []).responseApiError();
+    
+    res.status(500).json(
+      response
+    )
   }
 };
 
-
-
 const usuariosPut = async (req, res = response) => {
-  try {
+
     const { id } = req.params;
     const { _id, password, google, correo, ...resto } = req.body;
 
@@ -47,35 +53,49 @@ const usuariosPut = async (req, res = response) => {
       resto.password = bcryptjs.hashSync(password, salt);
     }
 
+    try {
     const usuario = await Usuario.findByIdAndUpdate(id, resto);
+    res.status(200).json({ 
+      status: 'successful',
+      data: usuario,
+    message: 'Usuario Encontrado'});
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'No se pudo actualizar el usuario',
+      ex.message,
+      []).responseApiError();
 
-    res.json(usuario);
-  } catch (error) {
-    console.log(error); // Opcional: Imprimir el error en la consola para fines de depuración
-    res.status(500).json({
-      ok: false,
-      msg: 'No se pudo actualizar el usuario',
-    });
+    res.status(500).json(
+      response
+    )
   }
 };
 
-
-
 const usuariosDelete = async (req, res = response) => {
-  try {
     // Destructuramos de donde viene el id
     const { id } = req.params;
-
+    try {
     // Fisicamente lo borramos
     // const usuario = await Usuario.findOneAndDelete( id );
     // Esta nos ayuda ya que se elimina desde mi backend pero queda en mi base de datos
     const usuario = await Usuario.findByIdAndUpdate(id, { estado: false });
 
-    res.json(usuario);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ 
-      msg : 'Error al eliminar el usuario' });
+    res.status(200).json({
+      status: 'successful',
+      data: usuario,
+      message: 'Usuario Eliminado Correctamente'
+    });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al eliminar el usuario',
+      ex.response,
+      []).responseApiError();
+
+    req.status(500).json(
+      response
+    )
   }
 };
 
@@ -86,24 +106,33 @@ const usuariosDeleteP = async (req, res = response ) =>{
     const usuarioEliminado = await Usuario.deleteOne({ _id: id });
 
     if (usuarioEliminado.deletedCount === 0) {
-      return res.status(404).json({
-        ok: false,
-        msg: 'Usuario no encontrado',
-      });
+      const response = new ResponseError(
+        'fial',
+        'Usuario no encontrado',
+        'El usuario no se encuentra al realizar la busqueda',
+        []).responseApiError();
+
+      return res.status(404).json(
+        response
+      )
     }
-    res.json({
-      ok: true,
-      mensaje: 'Usuario eliminado correctamente',
+    res.status(200).json({
+      status: 'successful',
+      message: 'Usuario eliminado correctamente',
     });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      ok: false,
-      msg: 'Error al eliminar el usuario',
-    });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al eliminar el usuario',
+      ex.message,
+      []).responseApiError();
+
+    return res.status(500).json(
+      response
+    )
   }
   
-}
+};
 
 
 

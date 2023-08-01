@@ -29,7 +29,7 @@ const actualPassword = async (req, res)  =>{
     try {
         await usuario.save();
         res.status(200).json({
-            status: 'success',
+            status: 'successful',
             message: 'Password Modificado Correctamente'
         })
     } catch (ex) {

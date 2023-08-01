@@ -183,7 +183,7 @@ const cerrarSesion = async (req, res) => {
         sameSite: 'none',
     });
     res.status(200).json({
-        status: 'success',
+        status: 'successful',
         
     })
 }

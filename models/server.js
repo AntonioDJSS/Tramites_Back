@@ -10,7 +10,7 @@ class Server {
         this.port = process.env.PORT || 8080; // Puerto por defecto 8080
         this.usuariosPath = '/api/usuarios';
         this.authPath = '/api/auth';
-        
+        this.chatgp3Path = '/api/chatgp3';
         this.tramiteControllerPath = '/api/tramiteController';
 
         // Conectar a base de datos
@@ -71,7 +71,7 @@ class Server {
         // Contiene middleware se llama al archivo donde tenemos las rutas
         this.app.use(this.authPath, require('../routes/authRoutes'));
         this.app.use(this.usuariosPath, require('../routes/usuarios'));
-
+        this.app.use(this.chatgp3Path, require('../routes/chatgp3Routes'));
         this.app.use(this.tramiteControllerPath, require('../routes/tramiteRoutes'));
 
         // Middleware para manejar rutas no reconocidas
