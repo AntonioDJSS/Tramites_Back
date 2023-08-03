@@ -181,21 +181,29 @@ const borrarAllTramite = async (req, res) => {
   }
 };
 
-// Reemplaza esto:
-// const mongoose = require('mongoose');
+// Importa la función para escapar caracteres especiales en expresiones regulares
+const escapeRegExp = (text) => {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};
+
+
 //Lo busca por Id
 const buscarTramite = async (req, res) => {
   const { nombre, id, valor, page, limit } = req.query;
 
   // Creamos un objeto de consulta
   const query = {};
+
   // Si el parámetro 'nombre' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'nombre' del array 'tramites'
   if (nombre) {
-    query['tramites.nombre'] = { $regex: nombre, $options: 'i' };
+    const regexNombre = new RegExp(escapeRegExp(nombre), 'i');
+    query['tramites.nombre'] = regexNombre;
   }
+
   // Si el parámetro 'valor' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'valor' del array 'tramites'
   if (valor) {
-    query['tramites.valor'] = { $regex: valor, $options: 'i' };
+    const regexValor = new RegExp(escapeRegExp(valor), 'i');
+    query['tramites.valor'] = regexValor;
   }
 
   if (id) {
@@ -205,30 +213,25 @@ const buscarTramite = async (req, res) => {
   // Convertir los parámetros de paginación y límite a números enteros
   const pageNumber = parseInt(page) || 1;
   const limitNumber = parseInt(limit) || 10; // Si no se proporciona 'limit', se asume un límite predeterminado de 10 registros por página
+
   // Calcular el número de registros para omitir y paginar correctamente los resultados
   const skip = (pageNumber - 1) * limitNumber;
 
   try {
-
     // Realizar la búsqueda en la base de datos utilizando Mongoose con paginación y límite
     const tramites = await Tramite.find(query)
       .skip(skip)
       .limit(limitNumber);
+
     res.status(200).json({
       status: 'successful',
       data: tramites,
-      message: 'Búsqueda Exitosa'
+      message: 'Búsqueda Exitosa',
     });
   } catch (ex) {
-    const response = new ResponseError(
-      'fail',
-      'Error al buscar el trámite',
-      ex.message,
-      []).responseApiError();
+    const response = new ResponseError('fail', 'Error al buscar el trámite', ex.message, []).responseApiError();
 
-    res.status(500).json(
-      response
-    )
+    res.status(500).json(response);
   }
 };
 
