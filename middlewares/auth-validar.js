@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const  Usuario  = require('../models/usuario');
+const ResponseError = require('../utils/ResponseError')
 
 const protect = async ( req, res, next) =>{
 
@@ -18,9 +19,18 @@ const protect = async ( req, res, next) =>{
       token = req.cookies.jwt;
       // console.log(req.cookie)
     }
-    if (!token) return res.status(401).json({ 
-      status: "error",
-      msg: "Tu no has iniciado sesión, por favor inicia sesión para obtener el acceso" });
+    if (!token) {
+      const response = new ResponseError(
+        'fail',
+        'Tu no has iniciado sesión, por favor inicia sesión para obtener el acceso',
+        'El  token no se obtiene de las cookies ni de los headers',
+        []).responseApiError();
+      return res.status(401).json(
+        response
+      )
+    }
+
+    
     
     try {
       //2) Verificar si el token es válido
@@ -29,19 +39,30 @@ const protect = async ( req, res, next) =>{
       //3) Verificar si el usuario existe
       const usuario = await Usuario.findById(decoded.uid)
     
-      if (!usuario) return res.status(404).json({ msg: "El usuario que pertenece a este token ya no existe"});
-    
-      
+      if (!usuario) {
+        const response = new ResponseError(
+          'fail',
+          'El usuario que pertenece a este token ya no existe',
+          'El token ya no exite , ya que el token esta vencido',
+          []).responseApiError();
+        return res.status(404).json(
+          response
+        )
+      }
       //ACCESO A LA RUTA
       req.usuario = usuario;
       
       
       next();
-    } catch (error) {
-      return res.status(401).json({
-        status: "error",
-        msg: "Token inválido",
-        error: error.msg });
+    } catch (ex) {
+      const response = new ResponseError(
+        'fail',
+        'Token inválido',
+        ex.message,
+        []).responseApiError();
+      return res.status(401).json(
+        response
+      )
     }
 
 }

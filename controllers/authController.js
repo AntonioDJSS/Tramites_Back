@@ -6,6 +6,7 @@ const { googleVerify } = require("../helpers/google-verify");
 const generarId = require("../helpers/generarId");
 const { emailOlvidePassword } = require('../helpers/email')
 const { emailRegistro } = require('../helpers/email')
+const ResponseError = require('../utils/ResponseError')
 
 const createSendToken = async (usuario, statusCode, req, res) => {
     // Generar el JWT
@@ -34,7 +35,7 @@ const createSendToken = async (usuario, statusCode, req, res) => {
     res.status(statusCode).json({
         status: "successful",
         token,
-        usuario,
+        data: usuario,
         message: "Inicio de Sesión Correctamente",
         checkToken: true
     });
@@ -184,6 +185,7 @@ const cerrarSesion = async (req, res) => {
     });
     res.status(200).json({
         status: 'successful',
+        message: 'Cerrando Sesion Correctamente'
         
     })
 }
@@ -295,7 +297,7 @@ const olvidePassword = async (req, res = response) => {
 
         res.status(200).json({
             status: 'successful',
-            msg: "Hemos enviado un email con las instrucciones"
+            message: "Hemos enviado un email con las instrucciones"
         })
     } catch (ex) {
         const response = new ResponseError(

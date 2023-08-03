@@ -4,6 +4,7 @@ const { response, request } = require('express');
 const bcryptjs = require('bcryptjs');
 const generarId = require('../helpers/generarId');
 const Usuario = require('../models/usuario');
+const ResponseError = require('../utils/ResponseError')
 
 //Aqui lo que se maneja es la url en parametros
 const usuariosGet = async (req = request, res = response) => {

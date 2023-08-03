@@ -217,6 +217,7 @@ const buscarTramite = async (req, res) => {
     res.status(200).json({
       status: 'successful',
       data: tramites,
+      message: 'Búsqueda Exitosa'
     });
   } catch (ex) {
     const response = new ResponseError(
@@ -230,6 +231,9 @@ const buscarTramite = async (req, res) => {
     )
   }
 };
+
+
+
 
 //Ya nada mas lee el archivo
 const cargarTramite = async (req, res) => {
@@ -293,7 +297,8 @@ const cargarTramite = async (req, res) => {
 
       // Verificar que el campo nombre tenga un valor antes de agregarlo al arreglo tramite
       if (key.trim() !== '') {
-        tramite.push({ nombre: key, valor: cleanValue });
+        const nombreCapitalizado = capitalizeName(key); // Capitalizar el campo "nombre"
+        tramite.push({ nombre: nombreCapitalizado, valor: cleanValue });
       }
     }
     // Agregar el arreglo de la fila al arreglo principal tramites
@@ -306,7 +311,7 @@ const cargarTramite = async (req, res) => {
       const nuevoTramite = new Tramite({ tramites: tramite });
       await nuevoTramite.save();
     } catch (ex) {
-
+      
       const response = new ResponseError(
         'fail',
         'Error al guardar el tramite',
@@ -341,6 +346,19 @@ const cargarTramite = async (req, res) => {
 };
 
 
+// Función para capitalizar el campo "nombre"
+const capitalizeName = (name) => {
+  // Convertir toda la cadena a minúsculas
+  const nameLower = name.toLowerCase();
+  
+  // Usar una función para capitalizar la primera letra de cada palabra
+  const capitalizedWords = nameLower.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1));
+  
+  // Unir las palabras capitalizadas para formar el campo "nombre" capitalizado
+  const capitalizedName = capitalizedWords.join(' ');
+
+  return capitalizedName;
+};
 
 
 const crearTramite = async (req, res) => {
@@ -367,18 +385,21 @@ const crearTramite = async (req, res) => {
 };
 
 const mostrarTramite = async (req, res) => {
-  try {
+  
     // Obtener los valores de page y limit del query string (si no se proporcionan, se utilizarán valores predeterminados)
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10; // Por ejemplo, 10 registros por página
     // Calcular el número de documentos que se deben omitir antes de mostrar los registros de la página actual
     const skip = (page - 1) * limit;
+
+    try {
     // Realizar la consulta a la base de datos con el paginado
     const tramite = await Tramite.find().skip(skip).limit(limit);
  
     res.status(200).json({
       status: "successful",
       data: tramite,
+      message: 'Registros Encontrados'
     });
   } catch (ex) {
 

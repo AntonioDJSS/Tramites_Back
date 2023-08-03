@@ -1,6 +1,7 @@
 const {getOne} = require('./handleFactory')
 const Usuario = require('../models/usuario');
 const bcryptjs = require('bcryptjs');
+const ResponseError = require('../utils/ResponseError')
 ///Control del Usuario/////
 
 const actualPassword = async (req, res)  =>{
@@ -54,7 +55,7 @@ const actualizarUsuario = async (req, res) => {
         const response = new ResponseError(
             'fail',
             'Usuario no encontrado',
-            'El Usuario no se encontro al querer obtenerse',
+            'El Usuario no se encontro en la peticion protect',
             []).responseApiError();
         
         return res.status(404).json(
@@ -91,7 +92,8 @@ const deleteMe = async(req,res,next)=>{
     await Usuario.findByIdAndUpdate(req.usuario.id,{activo: false});
     res.status(204).json({
         status: "successful",
-        data: null
+        data: null,
+        message: 'Borrado Correctamente',
     })
 };
 
