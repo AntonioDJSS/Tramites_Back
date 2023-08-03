@@ -1,25 +1,25 @@
+const { Schema, model } = require('mongoose');
 
-const { Schema, model }= require('mongoose');
-
-const TramiteSchema = Schema ({
+const TramiteSchema = Schema({
   tramites: [
     {
       nombre: {
-        type: String, 
-        // maxlength: [250, "El maximo de caracteres es: 550"],
+        type: String,
         required: [true, "El campo nombre es requerido"],
         trim: true
       },
       valor: {
         type: String,
-        // maxlength: [250, "El maximo de caracteres es: 550"],
         trim: true,
-        default: null 
+        default: null
       }
     }
-  ], 
-  createAt: {type: Date, default: new Date() } 
+  ],
+  contadorTramites: {
+    type: Number,
+    default: 0 // Inicialmente no hay tramites, así que el contador se inicia en 0
+  },
+  createAt: { type: Date, default: new Date() }
 });
 
-
-module.exports = model('Tramite', TramiteSchema )
+module.exports = model('Tramite', TramiteSchema);

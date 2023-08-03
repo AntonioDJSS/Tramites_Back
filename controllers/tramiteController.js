@@ -186,7 +186,6 @@ const escapeRegExp = (text) => {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
 
-
 //Lo busca por Id
 const buscarTramite = async (req, res) => {
   const { nombre, id, valor, page, limit } = req.query;
@@ -235,8 +234,19 @@ const buscarTramite = async (req, res) => {
   }
 };
 
+// Función para capitalizar el campo "nombre"
+const capitalizeName = (name) => {
+  // Convertir toda la cadena a minúsculas
+  const nameLower = name.toLowerCase();
+  
+  // Usar una función para capitalizar la primera letra de cada palabra
+  const capitalizedWords = nameLower.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1));
+  
+  // Unir las palabras capitalizadas para formar el campo "nombre" capitalizado
+  const capitalizedName = capitalizedWords.join(' ');
 
-
+  return capitalizedName;
+};
 
 //Ya nada mas lee el archivo
 const cargarTramite = async (req, res) => {
@@ -308,11 +318,23 @@ const cargarTramite = async (req, res) => {
     tramites.push(tramite);
   }
 
+   // Obtener el último valor del contador de tramites
+   const lastTramite = await Tramite.findOne().sort({ contadorTramites: -1 });
+   let contadorTramites = 1; // Si no hay tramites en la base de datos, el contador inicia en 1
+
+   if (lastTramite) {
+     contadorTramites = lastTramite.contadorTramites + 1;
+   }
+
   // Crear un documento de Tramite con los datos procesados y guardarlo en la base de datos
   for (const tramite of tramites) {
     try {
-      const nuevoTramite = new Tramite({ tramites: tramite });
+      const nuevoTramite = new Tramite({
+        tramites: tramite,
+        contadorTramites, // Agregamos el contador actualizado al nuevo tramite
+      });
       await nuevoTramite.save();
+      contadorTramites++;
     } catch (ex) {
       
       const response = new ResponseError(
@@ -329,7 +351,7 @@ const cargarTramite = async (req, res) => {
   }
 
   res.status(200).json({
-    status: 'success',
+    status: 'successful',
     data: tramites,
     message: 'Se Cargaron Correctamente los Tramites',
   });
@@ -348,26 +370,23 @@ const cargarTramite = async (req, res) => {
 }
 };
 
-
-// Función para capitalizar el campo "nombre"
-const capitalizeName = (name) => {
-  // Convertir toda la cadena a minúsculas
-  const nameLower = name.toLowerCase();
-  
-  // Usar una función para capitalizar la primera letra de cada palabra
-  const capitalizedWords = nameLower.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1));
-  
-  // Unir las palabras capitalizadas para formar el campo "nombre" capitalizado
-  const capitalizedName = capitalizedWords.join(' ');
-
-  return capitalizedName;
-};
-
-
 const crearTramite = async (req, res) => {
-
-  const tramite = Tramite(req.body);
   try {
+    // Obtener el último valor del contador de tramites
+    const lastTramite = await Tramite.findOne().sort({ contadorTramites: -1 });
+    let contadorTramites = 1; // Si no hay tramites en la base de datos, el contador inicia en 1
+
+    if (lastTramite) {
+      contadorTramites = lastTramite.contadorTramites + 1;
+    }
+
+    // Crear el nuevo tramite con el contador actualizado
+    const tramite = new Tramite({
+      tramites: req.body.tramites,
+      contadorTramites,
+    });
+
+    // Guardar el nuevo tramite en la base de datos
     const response = await tramite.save();
     res.status(200).json({
       status: "successful",
@@ -381,9 +400,7 @@ const crearTramite = async (req, res) => {
       ex.message,
       []).responseApiError();
 
-    res.status(500).json(
-      response
-    )
+    res.status(500).json(response);
   }
 };
 

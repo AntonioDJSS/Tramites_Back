@@ -1,7 +1,7 @@
 // const axios = require('axios');
 const ResponseError = require('../utils/ResponseError')
 // const AWS = require('aws-sdk');
-
+// Importa el paquete utf8
 
 // Configura el AWS SDK con las credenciales y la región adecuada donde está ubicada tu función Lambda
 
@@ -26,7 +26,7 @@ const ResponseError = require('../utils/ResponseError')
 //         }, { headers });
 
 //         const respuesta_chatgpt = response.data.choices[0].text.trim();
-        
+
 //         res.status(200).json({
 //             status: 'successful',
 //             Data: respuesta_chatgpt,
@@ -42,6 +42,7 @@ const ResponseError = require('../utils/ResponseError')
 //     }
 // };
 
+const utf8 = require('utf8');
 const awsConfig = require('../aws.config.json');
 const { LambdaClient, InvokeCommand } = require("@aws-sdk/client-lambda");
 const { fromUtf8 } = require("@aws-sdk/util-utf8-node");
@@ -56,9 +57,8 @@ const lambdaClient = new LambdaClient({
 
 const chatgp3L = async (req, res) => {
   try {
-    const prompt = JSON.stringify(req.body); // Convierte la pregunta a una cadena (string)
-
-    console.log(prompt)
+    const prompt = req.body.prompt; // Obtiene el prompt directamente como un string
+    console.log(prompt, ' prompt');
 
     // Configura el nombre de la función Lambda que deseas invocar
     const functionName = 'GPT-3_5';
@@ -67,19 +67,22 @@ const chatgp3L = async (req, res) => {
     const params = {
       FunctionName: functionName,
       InvocationType: 'RequestResponse', // La función se ejecuta de forma síncrona y retorna una respuesta
-      Payload: JSON.stringify({ prompt: prompt }), // Pasa la pregunta como argumento a la función Lambda
+      Payload: JSON.stringify({ prompt }), // Pasa el prompt como argumento a la función Lambda
     };
 
     // Invoca la función Lambda
     const command = new InvokeCommand(params);
-    console.log(command)
-   
+    console.log(command, ' command');
+
     const lambdaResponse = await lambdaClient.send(command);
-   console.log(lambdaResponse)
-    
-    // Extrae la respuesta de la función Lambda del campo "Payload" de la respuesta
-    const respuesta = JSON.parse(fromUtf8(lambdaResponse.Payload));
-    console.log(respuesta, 'respuesta')
+    console.log(lambdaResponse, ' lambdaResponse');
+
+
+    // Decodificar los datos binarios usando TextDecoder
+    const decoder = new TextDecoder('utf-8');
+    const decodedPayload = decoder.decode(lambdaResponse.Payload);
+    const respuesta = JSON.parse(decodedPayload);
+    console.log(respuesta, 'respuesta (parsed JSON)');
 
     res.status(200).json({
       status: 'successful',
@@ -98,6 +101,6 @@ const chatgp3L = async (req, res) => {
 };
 
 module.exports = {
-    // chatgp3,
-    chatgp3L
+  // chatgp3,
+  chatgp3L
 };
