@@ -150,7 +150,7 @@ const registrar = async (req, res) => {
 
     try {
         await usuario.save();
-    } catch (error) {
+    } catch (ex) {
         const response = new ResponseError(
             'fail',
             'Hubo un error al guardar el usuario en la base de datos',

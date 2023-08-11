@@ -8,6 +8,8 @@ const multer  = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({storage})
 const excel =  upload.single('archivo');
+const FuzzySearch = require('fuzzy-search');
+
 
 const actualizarTramite = async (req, res) => {
   const { id } = req.params;
