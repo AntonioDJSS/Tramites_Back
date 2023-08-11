@@ -7,6 +7,7 @@ const generarId = require("../helpers/generarId");
 const { emailOlvidePassword } = require('../helpers/email')
 const { emailRegistro } = require('../helpers/email')
 const ResponseError = require('../utils/ResponseError')
+const mongoose = require('mongoose');
 
 const createSendToken = async (usuario, statusCode, req, res) => {
     // Generar el JWT
@@ -44,6 +45,47 @@ const createSendToken = async (usuario, statusCode, req, res) => {
 
 const login = async (req, res = response) => {
     const { correo, password } = req.body;
+
+    if (!correo) {
+        const response = new ResponseError(
+            'fail',
+            'El correo es obligatorio',
+            'Ingresa el correo porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    // Validar si el correo electrónico tiene la estructura correcta
+    const correoRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!correoRegex.test(correo)) {
+        const response = new ResponseError(
+            'fail',
+            'El correo no es válido',
+            'Ingresa un correo válido en el formato correcto',
+            []
+        ).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    if (!password) {
+        const response = new ResponseError(
+            'fail',
+            'La contraseña es obligatoria',
+            'Ingresa la contraseña porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+
     let usuario = null;
     let valiPassword = null;
     try {
@@ -119,6 +161,83 @@ const registrar = async (req, res) => {
     const { nombre, correo, password, rol } = req.body;
     const usuario = new Usuario({ nombre, correo, password, rol });
 
+    if (!correo) {
+        const response = new ResponseError(
+            'fail',
+            'El correo es obligatorio',
+            'Ingresa el correo porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    // Validar si el correo electrónico tiene la estructura correcta
+    const correoRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!correoRegex.test(correo)) {
+        const response = new ResponseError(
+            'fail',
+            'El correo no es válido',
+            'Ingresa un correo válido en el formato correcto',
+            []
+        ).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    try {
+        const existingUser = await Usuario.findOne({ correo: correo });
+        if (existingUser) {
+            const response = new ResponseError(
+                'fail',
+                'El correo ya está registrado',
+                'El correo electrónico proporcionado ya está registrado en la base de datos',
+                []
+            ).responseApiError();
+
+            return res.status(400).json(response);
+        }
+    } catch (ex) {
+        const response = new ResponseError(
+            'fail',
+            'Hubo un error al verificar el correo',
+            ex.message,
+            []
+        ).responseApiError();
+
+        return res.status(500).json(response);
+    }
+
+    if (!password) {
+        const response = new ResponseError(
+            'fail',
+            'La contraseña es obligatoria',
+            'Ingresa la contraseña porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    // Validar si la contraseña tiene más de 6 caracteres
+    if (password.length >= 6) {
+        const response = new ResponseError(
+            'fail',
+            'Contraseña demasiado corta',
+            'La contraseña debe tener más de 6 caracteres',
+            []
+        ).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+
     try {
         const salt = bcryptjs.genSaltSync();
         usuario.password = bcryptjs.hashSync(password, salt);
@@ -186,7 +305,7 @@ const cerrarSesion = async (req, res) => {
     res.status(200).json({
         status: 'successful',
         message: 'Cerrando Sesion Correctamente'
-        
+
     })
 }
 
@@ -244,6 +363,20 @@ const confirmar = async (req, res = response) => {
 
 const olvidePassword = async (req, res = response) => {
     const { correo } = req.body;
+
+    if (!correo) {
+        const response = new ResponseError(
+            'fail',
+            'El correo es obligatorio',
+            'Ingresa el correo porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+
     let usuario = null;
     try {
         usuario = await Usuario.findOne({ correo });

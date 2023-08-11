@@ -1,14 +1,14 @@
+const FuzzySearch = require('fuzzy-search');
 const Tramite = require('../models/tramite')
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
 const xlsx = require('xlsx');
-const fs = require('fs');
 const ResponseError = require('../utils/ResponseError')
 const multer  = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({storage})
 const excel =  upload.single('archivo');
-const FuzzySearch = require('fuzzy-search');
+
+
+
 
 
 const actualizarTramite = async (req, res) => {
@@ -199,12 +199,14 @@ const buscarTramite = async (req, res) => {
   if (nombre) {
     const regexNombre = new RegExp(escapeRegExp(nombre), 'i');
     query['tramites.nombre'] = regexNombre;
+  
   }
 
   // Si el parámetro 'valor' está presente en la consulta, agregamos una expresión de búsqueda para el campo 'valor' del array 'tramites'
   if (valor) {
     const regexValor = new RegExp(escapeRegExp(valor), 'i');
     query['tramites.valor'] = regexValor;
+   
   }
 
   if (id) {
@@ -223,7 +225,6 @@ const buscarTramite = async (req, res) => {
     const tramites = await Tramite.find(query)
       .skip(skip)
       .limit(limitNumber);
-
     res.status(200).json({
       status: 'successful',
       data: tramites,

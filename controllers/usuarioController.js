@@ -2,12 +2,39 @@ const {getOne} = require('./handleFactory')
 const Usuario = require('../models/usuario');
 const bcryptjs = require('bcryptjs');
 const ResponseError = require('../utils/ResponseError')
+const mongoose = require('mongoose');
 ///Control del Usuario/////
 
 const actualPassword = async (req, res)  =>{
 
     const { password } = req.body;
     const usuario = req.usuario;
+
+    if (!password) {
+        const response = new ResponseError(
+            'fail',
+            'La contraseña es obligatoria',
+            'Ingresa la contraseña porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    // Validar si la contraseña tiene más de 6 caracteres
+    if (password.length >= 6) {
+        const response = new ResponseError(
+            'fail',
+            'Contraseña demasiado corta',
+            'La contraseña debe tener más de 6 caracteres',
+            []
+        ).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
 
     if (usuario) {
         usuario.password = password;

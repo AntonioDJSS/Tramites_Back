@@ -1,6 +1,5 @@
 const ResponseError = require('../utils/ResponseError')
 const Proyecto = require('../models/proyecto');
-
 const mongoose = require('mongoose');
 
 const crearProyecto = async (req, res) => {
@@ -127,8 +126,6 @@ const actualizarProyecto = async (req, res) => {
     res.status(500).json(response);
   }
 };
-
-
 
 const borrarProyecto = async (req, res) =>{
  
