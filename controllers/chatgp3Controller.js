@@ -43,15 +43,15 @@ const ResponseError = require('../utils/ResponseError')
 // };
 
 const utf8 = require('utf8');
-const awsConfig = require('../aws.config.json');
+
 const { LambdaClient, InvokeCommand } = require("@aws-sdk/client-lambda");
 const { fromUtf8 } = require("@aws-sdk/util-utf8-node");
 
 const lambdaClient = new LambdaClient({
-  region: awsConfig.region,
+  region: process.env.REGION,
   credentials: {
-    accessKeyId: awsConfig.accessKeyId,
-    secretAccessKey: awsConfig.secretAccessKey
+    accessKeyId: process.env.ACCESSKEYID,
+    secretAccessKey: process.env.SECRETACCESSKEY
   }
 });
 

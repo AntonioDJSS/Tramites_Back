@@ -1,18 +1,13 @@
 //Aqui se extrae un funcion de express
 const { Router } = require('express');
 const {check} = require('express-validator');
-
-const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { esAdminRole, tieneRole } = require('../middlewares/validar-roles');
 const { protect } = require ('../middlewares/auth-validar')
 
 const { esRoleValido } = require('../helpers/db-validators');
-const { emailExiste } = require('../helpers/db-validators');
 const { existeUsuarioPorId } = require('../helpers/db-validators');
-
 const { usuariosGet, 
-        
         usuariosPut,
         usuariosDelete,
         usuariosDeleteP

@@ -2,7 +2,6 @@
 //realizar el res de manera por default por lo que se iguala
 const { response, request } = require('express');
 const bcryptjs = require('bcryptjs');
-const generarId = require('../helpers/generarId');
 const Usuario = require('../models/usuario');
 const ResponseError = require('../utils/ResponseError')
 
@@ -139,7 +138,6 @@ const usuariosDeleteP = async (req, res = response ) =>{
 
   module.exports = {
     usuariosGet,
-   
     usuariosPut,
     usuariosDelete,
     usuariosDeleteP,

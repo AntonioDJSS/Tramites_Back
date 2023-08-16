@@ -12,6 +12,7 @@ class Server {
         this.chatgp3Path = '/api/chatgp3';
         this.tramiteControllerPath = '/api/tramiteController';
         this.proyectoPath = '/api/proyecto';
+        this.pdfPath = '/api/pdf';
 
         // Conectar a base de datos
         this.conectarDB();
@@ -69,6 +70,7 @@ class Server {
         this.app.use(this.chatgp3Path, require('../routes/chatgp3Routes'));
         this.app.use(this.tramiteControllerPath, require('../routes/tramiteRoutes'));
         this.app.use(this.proyectoPath, require('../routes/proyectoRoutes'));
+        this.app.use(this.pdfPath, require('../routes/pdfRoutes.js'));
 
 
         // Middleware para manejar rutas no reconocidas
