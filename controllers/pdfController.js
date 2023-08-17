@@ -55,7 +55,7 @@ const generarPdf = async (req, res) => {
 
                     p {
                         margin: 0;
-                        padding: 0;
+                        padding: 2px;
                     }
             
                     .header {
@@ -63,14 +63,6 @@ const generarPdf = async (req, res) => {
                         width: 99%;
                         align-items: center;
                         border: 1px solid #000;
-                    }
-
-                    .header2 {
-                        display: flex;
-                        width: 99%;
-                        align-items: center;
-                        border: 1px solid #000;
-                        border-top: none; 
                     }
             
                     .logo {
@@ -108,67 +100,69 @@ const generarPdf = async (req, res) => {
 
 
                 <body>
-                <div class="header">
-                    <div class="logo">
-                        <img src="https://iktanstrategies.com/LogoStrategies.png" alt="Logo">
+                <div style="display: flex; flex-direction: row; align-items: center; width: 99%; border: 1px solid #000; font-size: 10px;">
+                    <div style="flex-basis: 33.3%; padding-left: 2px; ">
+                        <img width="50%" src="https://iktanstrategies.com/LogoStrategies.png" />
                     </div>
 
-                    <div class="title">
-                        <h1>Trámite para Contrato Petrolero</h1>
+                    <div style="flex-basis: 33.3%;">
+                        <h1> Tramite Petrolero </h1>
                     </div>
 
-                    <div class="info">
-                        <div class="info-item">
-                            <p>Id:</p>
-                            <p>1</p>
+                    <div style="flex-basis: 33.4%; display: flex; flex-direction: column; width: 100%; ">
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> Id: </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${ tramite.contadorTramites } </p>
                         </div>
-                        <div class="info-item">
-                            <p>Autoridad:</p>
-                            <p>CNDH</p>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> Autoridad: </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${ tramite.tramites[18].valor } </p>
                         </div>
-                        <div class="info-item">
-                            <p>Revision:</p>
-                            <p>25/01/23</p>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000;"> Revisión: </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000;"> ${ tramite.tramites[37].valor } </p>
                         </div>
                     </div>
                 </div>
 
-
-                <div class="header2" >
-                    <div style="flex-basis: 15%; font-size: 10px; margin: 0px; line-height: 15px;   ">
-                        <p style="border: 1px solid #000;">Trámite: </p>
-                        <p style="border: 1px solid #000;">Regulación: </p>
-                        <p style="border: 1px solid #000;">Formato: </p>
-                    </div>
-                    <div style="flex-basis: 55%; font-size: 10px; margin: 0px; line-height: 15px;  ">
-                        <p style="border: 1px solid #000;"> ${ tramite.tramites[24].valor } </p>
-                        <p style="border: 1px solid #000;"> ${ tramite.tramites[15].valor } </p>
-                        <p style="border: 1px solid #000;"> ${ tramite.tramites[27].valor } </p>
-                    </div>
-                    <div style="flex-basis: 15%; font-size: 10px; margin: 0px; line-height: 15px; ">
-                        <p style="border: 1px solid #000;">Tipo: </p>
-                        <p style="border: 1px solid #000;">Homoclave: </p>
-                        <p style="border: 1px solid #000;"> </p>
-                    </div>
-                    <div style="flex-basis: 15%; font-size: 10px; margin: 0px; line-height: 15px; ">
-                        <p style="border: 1px solid #000;"> ${ tramite.tramites[0].valor } </p>
-                        <p style="border: 1px solid #000;"> ${ tramite.tramites[26].valor } </p>
-                        <p style="border: 1px solid #000;">  </p>
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Trámite: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[24].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Tipo:</p>
+                        <p style="flex-basis: 15%; ">${ tramite.tramites[0].valor }</p>
                     </div>
                 </div>
 
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Regulación: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[15].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> Homoclave:</p>
+                        <p style="flex-basis: 15%; ">${ tramite.tramites[26].valor } </p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Formato: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[27].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
+                        <p style="flex-basis: 15%; "> </p>
+                    </div>
+                </div>
 
 
                 <div style="display: flex; flex-direction: row; width: 99%; align-items: center; border: 1px solid #000;
                 border-top: none; font-size: 10px;">
                     <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%; ">
                         <p style="flex-basis: 50%; border-right: 1px solid #000;">¿Genera Resolución?</p>
-                        <p style="flex-basis: 50%; border-right: 1px solid #000;">Si</p>
+                        <p style="flex-basis: 50%; border-right: 1px solid #000;">${ tramite.tramites[31].valor }</p>
                     </div>
 
                     <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%;">
                         <p style="flex-basis: 50%; border-right: 1px solid #000;">Resolucion: </p>
-                        <p style="flex-basis: 50%;">Los avisos no generan una resolución </p>
+                        <p style="flex-basis: 50%;">${ tramite.tramites[45].valor }</p>
                     </div>
                 </div>
 
@@ -235,11 +229,56 @@ const generarPdf = async (req, res) => {
                 </div>
 
                 <div>
-                    <div style="display: flex; flex-direction: row;">
-                        <p style="flex-basis: 25%;">Detonante: </p>
-                        <p style="flex-basis: 25%;">${ tramite.tramites[19].valor }</p>
-                        <p style="flex-basis: 25%;">Presentación: </p>
-                        <p style="flex-basis: 25%;">${ tramite.tramites[23].valor }</p>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Detonante: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[19].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Presentación: </p>
+                        <p style="flex-basis: 15%; ">${ tramite.tramites[23].valor }</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Articulos: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[17].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Periodicidad: </p>
+                        <p style="flex-basis: 15%; ">${ tramite.tramites[29].valor }</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> Regulacion (link): </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[46].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> </p>
+                        <p style="flex-basis: 15%; "></p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Referencia: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[47].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
+                        <p style="flex-basis: 15%; "></p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Comentarios: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[36].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> </p>
+                        <p style="flex-basis: 15%; "> </p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Requisitos: </p>
+                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[48].valor }</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
+                        <p style="flex-basis: 15%; "> </p>
                     </div>
                 </div>
 
@@ -264,10 +303,22 @@ const generarPdf = async (req, res) => {
         const filePath = `upload/example.pdf`; // Ruta donde se guardará el PDF en la carpeta "utils"
         fs.writeFileSync(filePath, pdfBuffer); // Guarda el PDF en el archivo
 
-        res.status(200).send('PDF generado y guardado en carpeta.');
+        res.status(200).json({
+            status: 'sucessful',
+            message: 'PDF generado y guardado en carpeta.'
+        })
+
+        
     } catch (ex) {
-        console.log(ex)
-        res.status(500).send('Error generando el PDF');
+        const response = new ResponseError(
+            'fail',
+            'Error generando el PDF',
+            ex.message,
+            []).responseApiError();
+
+        res.status(500).json(
+            response
+        )
     }
 };
 
