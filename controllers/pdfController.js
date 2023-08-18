@@ -9,6 +9,7 @@ const generarPdf = async (req, res) => {
 
     //Validamos id existente
     if (!id) {
+
         const response = new ResponseError(
             'fail',
             'Id del tramite no existe',
@@ -49,13 +50,14 @@ const generarPdf = async (req, res) => {
                     }
     
                     body {
-                        margin: 0;
+                        
                         font-family: Arial, sans-serif;
                     }
 
                     p {
                         margin: 0;
-                        padding: 2px;
+                        padding: 4px 0px 4px 3px; 
+
                     }
             
                     .header {
@@ -64,88 +66,57 @@ const generarPdf = async (req, res) => {
                         align-items: center;
                         border: 1px solid #000;
                     }
-            
-                    .logo {
-                        flex-basis: 20%;
-                    }
-            
-                    .logo img {
-                        width: 100%;
-                        height: auto;
-                    }
-            
-                    .title {
-                        flex-basis: 55%;
-                        text-align: center;
-                        font-size: 10px; 
-                        line-height: 8px; 
-                    }
-            
-                    .info {
-                        flex-basis: 25%;
-                        display: flex;
-                        flex-direction: column; 
-                    }
-            
-                    .info-item {
-                        flex-basis: 30%;
-                        text-align: center;
-                        display: flex;
-                        font-size: 10px; 
-                        line-height: 15px; 
-                        justify-content: center;
-                    }
                     </style>
                 </head>
 
 
                 <body>
                 <div style="display: flex; flex-direction: row; align-items: center; width: 99%; border: 1px solid #000; font-size: 10px;">
-                    <div style="flex-basis: 33.3%; padding-left: 2px; ">
-                        <img width="50%" src="https://iktanstrategies.com/LogoStrategies.png" />
+                    <div style="flex-basis: 33.3%;  ">
+                        <img width="45%" style="padding-left: 4px;" src="https://iktanstrategies.com/LogoStrategies.png" />
                     </div>
 
-                    <div style="flex-basis: 33.3%;">
+                    <div style="flex-basis: 36.7%; line-height: 0px; ">
                         <h1> Tramite Petrolero </h1>
                     </div>
 
-                    <div style="flex-basis: 33.4%; display: flex; flex-direction: column; width: 100%; ">
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> Id: </p>
+                    <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 33.3%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; "> Id: </p>
                             <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${ tramite.contadorTramites } </p>
                         </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> Autoridad: </p>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 33.3%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;"> Autoridad: </p>
                             <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${ tramite.tramites[18].valor } </p>
                         </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000;"> Revisión: </p>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; height: 33.3%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;" > Revisión: </p>
                             <p style="flex-basis: 50%; border-left: 1px solid #000;"> ${ tramite.tramites[37].valor } </p>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Trámite: </p>
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Trámite: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[24].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Tipo:</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Tipo:</p>
                         <p style="flex-basis: 15%; ">${ tramite.tramites[0].valor }</p>
                     </div>
                 </div>
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Regulación: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Regulación: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[15].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> Homoclave:</p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;"> Homoclave:</p>
                         <p style="flex-basis: 15%; ">${ tramite.tramites[26].valor } </p>
                     </div>
                 </div>
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Formato: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Formato: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[27].valor }</p>
                         <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
                         <p style="flex-basis: 15%; "> </p>
@@ -154,14 +125,14 @@ const generarPdf = async (req, res) => {
 
 
                 <div style="display: flex; flex-direction: row; width: 99%; align-items: center; border: 1px solid #000;
-                border-top: none; font-size: 10px;">
+                font-size: 10px; margin-top: 20px;">
                     <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%; ">
-                        <p style="flex-basis: 50%; border-right: 1px solid #000;">¿Genera Resolución?</p>
+                        <p style="flex-basis: 50%; border-right: 1px solid #000; background-color: #D9D9D9;">¿Genera Resolución?</p>
                         <p style="flex-basis: 50%; border-right: 1px solid #000;">${ tramite.tramites[31].valor }</p>
                     </div>
 
                     <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%;">
-                        <p style="flex-basis: 50%; border-right: 1px solid #000;">Resolucion: </p>
+                        <p style="flex-basis: 50%; border-right: 1px solid #000; background-color: #D9D9D9;">Resolucion: </p>
                         <p style="flex-basis: 50%;">${ tramite.tramites[45].valor }</p>
                     </div>
                 </div>
@@ -170,8 +141,8 @@ const generarPdf = async (req, res) => {
 
                 <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000;
                 border-top: none;">
-                    <p style="flex-basis: 50%; border-right: 1px solid #000;">Plazo para presentar </p>
-                    <p style="flex-basis: 50%;">${ tramite.tramites[30].valor }</p>
+                    <p style="flex-basis: 25%; border-right: 1px solid #000; background-color: #D9D9D9;">Plazo para presentar </p>
+                    <p style="flex-basis: 75%;">${ tramite.tramites[30].valor }</p>
                 </div>
 
                 
@@ -179,18 +150,18 @@ const generarPdf = async (req, res) => {
 
                 <div style="display: flex; flex-direction: row;  width: 99%; font-size: 10px; border: 1px solid #000;
                 border-top: none; ">
-                    <div style="flex-basis: 25%; border-right: 1px solid #000;">
-                        <p style="border-bottom: 1px solid #000;">Sujeto a Respuesta</p>
-                        <p style="border-bottom: 1px solid #000;">Fecha de Ingreso</p>
-                        <p style="border-bottom: 1px solid #000;">Fecha Maxima de Resolucion</p>
-                        <p style="border-bottom: 1px solid #000;">Fecha Minima de Resolucion</p>
-                        <p style="border-bottom: 1px solid #000;">Plazo de Prevencion</p>
-                        <p style="border-bottom: 1px solid #000;">Plazo para respuesta de Prevencion</p>
-                        <p style="border-bottom: 1px solid #000;">Plazo de Respuesta de la Autoridad</p>
-                        <p >Plazo Maximo de Respuesta</p>
+                    <div style="flex-basis: 15%; border-right: 1px solid #000;">
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Sujeto a Respuesta</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Fecha de Ingreso</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Fecha Maxima de Resolucion</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Fecha Minima de Resolucion</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Plazo de Prevencion</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Plazo para respuesta de Prevencion</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Plazo de Respuesta de la Autoridad</p>
+                        <p style=" background-color: #D9D9D9; ">Plazo Maximo de Respuesta</p>
                     </div>
                     
-                    <div style="flex-basis: 25%; border-right: 1px solid #000;">
+                    <div style="flex-basis: 15%; border-right: 1px solid #000;">
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[31].valor }</p>
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[38].valor }</p>
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[39].valor }</p>
@@ -201,14 +172,14 @@ const generarPdf = async (req, res) => {
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[44].valor }</p>
                     </div>
                     
-                    <div style="flex-basis: 25%; border-right: 1px solid #000;">
+                    <div style="flex-basis: 40%; border-right: 1px solid #000;">
                         <p> Imagen con los Tiempos de la Tabla </p>
                     </div>
 
-                    <div style="flex-basis: 25%; border-right: 1px solid #000;">
-                        <p style="border-bottom: 1px solid #000;">Tiene Monto de Derechos o Aprovechamientos?</p>
-                        <p style="border-bottom: 1px solid #000;">Nombre del Aprovechamiento</p>
-                        <p style="border-bottom: 1px solid #000;">Monto mxn 2020</p>
+                    <div style="flex-basis: 15%; border-right: 1px solid #000;">
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Tiene Monto de Derechos o Aprovechamientos?</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Nombre del Aprovechamiento</p>
+                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Monto mxn 2020</p>
                         <p></p>
                         <p></p>
                         <p></p>
@@ -216,7 +187,7 @@ const generarPdf = async (req, res) => {
                         <p></p>
                     </div>
 
-                    <div>
+                    <div style=" flex-basis: 15%;">
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[33].valor }</p>
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[34].valor }</p>
                         <p style="border-bottom: 1px solid #000;">${ tramite.tramites[45].valor }</p>
@@ -228,27 +199,27 @@ const generarPdf = async (req, res) => {
                     </div>
                 </div>
 
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Detonante: </p>
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; ">
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Detonante: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[19].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Presentación: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Presentación: </p>
                         <p style="flex-basis: 15%; ">${ tramite.tramites[23].valor }</p>
                     </div>
                 </div>
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Articulos: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Articulos: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[17].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Periodicidad: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Periodicidad: </p>
                         <p style="flex-basis: 15%; ">${ tramite.tramites[29].valor }</p>
                     </div>
                 </div>
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> Regulacion (link): </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;"> Regulacion (link): </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[46].valor }</p>
                         <p style="flex-basis: 15%; border-right: 1px solid #000;"> </p>
                         <p style="flex-basis: 15%; "></p>
@@ -257,7 +228,7 @@ const generarPdf = async (req, res) => {
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Referencia: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Referencia: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[47].valor }</p>
                         <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
                         <p style="flex-basis: 15%; "></p>
@@ -266,7 +237,7 @@ const generarPdf = async (req, res) => {
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Comentarios: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Comentarios: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[36].valor }</p>
                         <p style="flex-basis: 15%; border-right: 1px solid #000;"> </p>
                         <p style="flex-basis: 15%; "> </p>
@@ -275,7 +246,7 @@ const generarPdf = async (req, res) => {
 
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;">Requisitos: </p>
+                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Requisitos: </p>
                         <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[48].valor }</p>
                         <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
                         <p style="flex-basis: 15%; "> </p>
@@ -296,7 +267,9 @@ const generarPdf = async (req, res) => {
                 right: '1cm',
                 bottom: '1cm',
                 left: '1cm'
-            } });
+            },
+            printBackground: true, //Con esta opción se habilita el color de fondo en el pdf
+        });
 
         await browser.close();
 

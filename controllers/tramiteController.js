@@ -1,4 +1,4 @@
-const FuzzySearch = require('fuzzy-search');
+
 const Tramite = require('../models/tramite')
 const xlsx = require('xlsx');
 const ResponseError = require('../utils/ResponseError')
@@ -235,7 +235,7 @@ const buscarTramite = async (req, res) => {
 
     res.status(500).json(response);
   }
-};
+};                        
 
 // Función para capitalizar el campo "nombre"
 const capitalizeName = (name) => {
