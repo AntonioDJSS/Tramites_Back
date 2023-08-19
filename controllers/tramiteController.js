@@ -222,6 +222,7 @@ const buscarTramite = async (req, res) => {
 
   try {
     // Realizar la búsqueda en la base de datos utilizando Mongoose con paginación y límite
+    //{'tramites.valor': {'$regex': /Aviso de formalización de la Cesión del Control Corporativo y de Gestión o de la Cesión del Control de las OperacionAS/}}
     const tramites = await Tramite.find(query)
       .skip(skip)
       .limit(limitNumber);
