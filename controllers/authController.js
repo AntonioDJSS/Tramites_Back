@@ -6,6 +6,7 @@ const { googleVerify } = require("../helpers/google-verify");
 const generarId = require("../helpers/generarId");
 const { emailOlvidePassword } = require('../helpers/email')
 const { emailRegistro } = require('../helpers/email')
+// const { emailRegistroP, emailOlvidePasswordP } = require('../helpers/emailSender')
 const ResponseError = require('../utils/ResponseError')
 const mongoose = require('mongoose');
 
@@ -223,20 +224,19 @@ const registrar = async (req, res) => {
         );
     }
 
-    // Validar si la contraseña tiene más de 6 caracteres
-    if (password.length >= 6) {
-        const response = new ResponseError(
-            'fail',
-            'Contraseña demasiado corta',
-            'La contraseña debe tener más de 6 caracteres',
-            []
-        ).responseApiError();
+   // Validar si la contraseña tiene al menos 6 caracteres
+if (password.length < 6) {
+    const response = new ResponseError(
+        'fail',
+        'Contraseña demasiado corta',
+        'La contraseña debe tener al menos 6 caracteres',
+        []
+    ).responseApiError();
 
-        return res.status(400).json(
-            response
-        );
-    }
-
+    return res.status(400).json(
+        response
+    );
+}
 
     try {
         const salt = bcryptjs.genSaltSync();
