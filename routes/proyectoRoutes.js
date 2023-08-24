@@ -1,15 +1,28 @@
 const { Router } = require("express")
 const { crearProyecto,
-    mostrarProyectos,
-        actualizarProyecto,
-        borrarProyecto } = require('../controllers/proyectoController')
+        mostrarProyectos,
+        actualizarProyectos,
+        borrarProyectos,
+        misProyectos } = require('../controllers/proyectoController')
 
+const { protect } = require('../middlewares/auth-validar');
 const router = Router();
 
-router.post('/', crearProyecto )
+router.post('/',[
+    protect
+], crearProyecto )
+
+//USER
+router.get('/misProyectos',[
+    protect
+], misProyectos)
+
+
+
+//ADMIN
 router.get('', mostrarProyectos )
-router.put('/:id', actualizarProyecto )
-router.delete('/:id', borrarProyecto )
+router.put('/:id', actualizarProyectos )
+router.delete('/:id', borrarProyectos )
 
 
 

@@ -11,7 +11,7 @@ const { usuariosGet,
         usuariosPut,
         usuariosDelete,
         usuariosDeleteP
-         } = require('../controllers/usuarios');
+         } = require('../controllers/usuarioController');
 
 //Aqui llamamos a la funcion que estamos extrayendo de express
 const router = Router();

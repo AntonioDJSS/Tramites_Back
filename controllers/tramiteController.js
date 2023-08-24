@@ -6,7 +6,7 @@ const multer  = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({storage})
 const excel =  upload.single('archivo');
-
+const FuzzySearch = require('fuzzy-search');
 
 
 
@@ -221,16 +221,44 @@ const buscarTramite = async (req, res) => {
   const skip = (pageNumber - 1) * limitNumber;
 
   try {
-    // Realizar la búsqueda en la base de datos utilizando Mongoose con paginación y límite
-    //{'tramites.valor': {'$regex': /Aviso de formalización de la Cesión del Control Corporativo y de Gestión o de la Cesión del Control de las OperacionAS/}}
     const tramites = await Tramite.find(query)
       .skip(skip)
       .limit(limitNumber);
-    res.status(200).json({
-      status: 'successful',
-      data: tramites,
-      message: 'Búsqueda Exitosa',
-    });
+
+    if (tramites.length === 0) {
+      // Realizar una búsqueda difusa si no se encontraron resultados exactos
+      const allTramites = await Tramite.find();
+      const searcher = new FuzzySearch(allTramites, ['nombre'], {
+        caseSensitive: false, // Considerar la búsqueda sin distinción entre mayúsculas y minúsculas
+        sort: true, // Ordenar los resultados por similitud
+      });
+
+      const fuzzyResults = searcher.search(nombre);
+
+      if (fuzzyResults.length === 0) {
+        const response = new ResponseError(
+          'fail',
+          'No se encontraron trámites que coincidan con los criterios de búsqueda.',
+          'No hay coincidencias de la busqueda',
+          []).responseApiError();
+        res.status(404).json(
+          response
+        )
+      } else {
+        res.status(200).json({
+          status: 'successful',
+          data: fuzzyResults,
+          message: 'Búsqueda Exitosa (difusa)',
+        });
+      }
+    } else {
+      // Si se encontraron resultados exactos, enviar los resultados
+      res.status(200).json({
+        status: 'successful',
+        data: tramites,
+        message: 'Búsqueda Exitosa',
+      });
+    }
   } catch (ex) {
     const response = new ResponseError('fail', 'Error al buscar el trámite', ex.message, []).responseApiError();
 

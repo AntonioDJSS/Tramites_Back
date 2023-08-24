@@ -19,7 +19,24 @@ const TramiteSchema = Schema({
     type: Number,
     default: 0 // Inicialmente no hay tramites, así que el contador se inicia en 0
   },
-  createAt: { type: Date, default: new Date() }
+  createAt: { 
+    type: Date, 
+    default: new Date() 
+  },
+  reporte: [
+    {
+      url:{
+        type: String,
+        trim: true,
+        default: null
+      },
+      key:{
+        type: String,
+        trim: true,
+        default: null
+      }
+    }
+  ]
 });
 
 module.exports = model('Tramite', TramiteSchema);

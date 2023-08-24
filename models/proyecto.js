@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, default: mongoose } = require('mongoose');
 
 const ProyectoSchema = Schema({
 
@@ -27,6 +27,11 @@ const ProyectoSchema = Schema({
     estado:{
         type: String,
         maxlength: [250, 'La descripción no debe exceder los 250 caracteres']
+    },
+    usuario:{
+        type: mongoose.Schema.ObjectId,
+        required: [true, 'El Usuario es requerido para la creación del proyecto'],
+        ref: 'Usuario'
     }
 })
 

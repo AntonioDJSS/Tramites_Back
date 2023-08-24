@@ -76,7 +76,7 @@ const generarPdf = async (req, res) => {
                         <img width="45%" style="padding-left: 4px;" src="https://iktanstrategies.com/LogoStrategies.png" />
                     </div>
 
-                    <div style="flex-basis: 36.7%; line-height: 0px; ">
+                    <div style="flex-basis: 36.7%; line-height: 0px;  ">
                         <h1> Tramite Petrolero </h1>
                     </div>
 
@@ -137,73 +137,96 @@ const generarPdf = async (req, res) => {
                     </div>
                 </div>
 
-
-
                 <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000;
                 border-top: none;">
                     <p style="flex-basis: 25%; border-right: 1px solid #000; background-color: #D9D9D9;">Plazo para presentar </p>
                     <p style="flex-basis: 75%;">${ tramite.tramites[30].valor }</p>
                 </div>
 
-                
 
-
-                <div style="display: flex; flex-direction: row;  width: 99%; font-size: 10px; border: 1px solid #000;
-                border-top: none; ">
-                    <div style="flex-basis: 15%; border-right: 1px solid #000;">
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Sujeto a Respuesta</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Fecha de Ingreso</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Fecha Maxima de Resolucion</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Fecha Minima de Resolucion</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Plazo de Prevencion</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Plazo para respuesta de Prevencion</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Plazo de Respuesta de la Autoridad</p>
-                        <p style=" background-color: #D9D9D9; ">Plazo Maximo de Respuesta</p>
-                    </div>
-                    
-                    <div style="flex-basis: 15%; border-right: 1px solid #000;">
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[31].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[38].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[39].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[40].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[41].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[42].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[43].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[44].valor }</p>
-                    </div>
-                    
-                    <div style="flex-basis: 40%; border-right: 1px solid #000;">
-                        <p> Imagen con los Tiempos de la Tabla </p>
-                    </div>
-
-                    <div style="flex-basis: 15%; border-right: 1px solid #000;">
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Tiene Monto de Derechos o Aprovechamientos?</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Nombre del Aprovechamiento</p>
-                        <p style="border-bottom: 1px solid #000; background-color: #D9D9D9;">Monto mxn 2020</p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
+                <div style="display: flex; flex-direction: row; align-items: center; width: 99%;  border: 1px solid #000; font-size: 10px; border-top: none; height: 300px; ">  
+                    <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Sujeto a Respuesta </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9;"> Fecha de Ingreso </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000;"> ${ tramite.tramites[18].valor } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9;" > Fecha Maxima de Resolución </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000;"> ${ tramite.tramites[37].valor } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Fecha Minima de Resolución </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo de Prevención </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo para respuesta a Prevención </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo de Respuesta de la Autoridad </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo Máximo de Respuesta </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
                     </div>
 
-                    <div style=" flex-basis: 15%;">
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[33].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[34].valor }</p>
-                        <p style="border-bottom: 1px solid #000;">${ tramite.tramites[45].valor }</p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
+                    <div style="flex-basis: 40%; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; ">
+                        <p>Aqui va una imagen</p>
                     </div>
-                </div>
+
+                    <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; "> Tiene Monto de derechos o aprovechamientos </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${ tramite.contadorTramites } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;"> Nombre del Aprovechamiento </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${ tramite.tramites[18].valor } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; border-bottom: 1px solid #000; height: 33.3%; height: 12%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;" > Monto mxn 2020 </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000;"> ${ tramite.tramites[37].valor } </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; ">  </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;">  </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;" >  </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000;">  </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; ">  </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
+                        </div>
+                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;">  </p>
+                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
+                        </div>
+
+                    </div>
+
+                </div>          
 
                 <div style="margin-top: 20px;">
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; ">
                         <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Detonante: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[19].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Presentación: </p>
+                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${ tramite.tramites[19].valor }</p>
+                        <p style="flex-basis: 14%; border-right: 1px solid #000; background-color: #D9D9D9;">Presentación: </p>
                         <p style="flex-basis: 15%; ">${ tramite.tramites[23].valor }</p>
                     </div>
                 </div>
@@ -211,8 +234,8 @@ const generarPdf = async (req, res) => {
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
                         <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Articulos: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[17].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Periodicidad: </p>
+                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${ tramite.tramites[17].valor }</p>
+                        <p style="flex-basis: 14%; border-right: 1px solid #000; background-color: #D9D9D9;">Periodicidad: </p>
                         <p style="flex-basis: 15%; ">${ tramite.tramites[29].valor }</p>
                     </div>
                 </div>
@@ -220,8 +243,8 @@ const generarPdf = async (req, res) => {
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
                         <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;"> Regulacion (link): </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[46].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> </p>
+                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${ tramite.tramites[46].valor }</p>
+                        <p style="flex-basis: 14%; border-right: 1px solid #000;"> </p>
                         <p style="flex-basis: 15%; "></p>
                     </div>
                 </div>
@@ -229,8 +252,8 @@ const generarPdf = async (req, res) => {
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
                         <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Referencia: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[47].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
+                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${ tramite.tramites[47].valor }</p>
+                        <p style="flex-basis: 14%; border-right: 1px solid #000;"></p>
                         <p style="flex-basis: 15%; "></p>
                     </div>
                 </div>
@@ -238,8 +261,8 @@ const generarPdf = async (req, res) => {
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
                         <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Comentarios: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[36].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"> </p>
+                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${ tramite.tramites[36].valor }</p>
+                        <p style="flex-basis: 14%; border-right: 1px solid #000;"> </p>
                         <p style="flex-basis: 15%; "> </p>
                     </div>
                 </div>
@@ -247,8 +270,8 @@ const generarPdf = async (req, res) => {
                 <div>
                     <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
                         <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Requisitos: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${ tramite.tramites[48].valor }</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
+                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${ tramite.tramites[48].valor }</p>
+                        <p style="flex-basis: 14%; border-right: 1px solid #000;"></p>
                         <p style="flex-basis: 15%; "> </p>
                     </div>
                 </div>
