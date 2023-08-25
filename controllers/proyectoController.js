@@ -5,90 +5,78 @@ const Usuario = require('../models/usuario')
 
 
 
-
-
 const crearProyecto = async (req, res) => {
-    const { idt, nombre, descripcion, empresa, fechainicio, fechafin, estado } = req.body;
-    const usuario = req.usuario;
-    
-    if (!usuario) {
-        const response = new ResponseError(
-          'fail',
-          'El usuario no existe',
-          'No se encuentra el Usuario en la ruta',
-          []).responseApiError();
+  const { idt, nombre, descripcion, empresa, fechainicio, fechafin, estado } = req.body;
+  const usuario = req.usuario;
 
-        res.status(404).json(
-          response
-        )
-    }
+  if (!usuario) {
+      // Manejo de error cuando no se encuentra el usuario
+      return res.status(404).json({
+          status: 'fail',
+          message: 'El usuario no existe en la ruta'
+      });
+  }
 
-    
+  // Verificar que los campos requeridos estén presentes en la solicitud
+  if (!nombre || !descripcion || !empresa || !fechainicio || !fechafin || !estado) {
+      // Manejo de error cuando faltan campos obligatorios
+      return res.status(400).json({
+          status: 'fail',
+          message: 'Faltan campos obligatorios en la solicitud'
+      });
+  }
 
-    // Verificar que los campos requeridos estén presentes en la solicitud
-    if (!idt || !nombre || !descripcion || !empresa || !fechainicio || !fechafin || !estado || !usuario) {
+  try {
+      const usuarioExiste = await Usuario.findById(usuario.id);
 
-      const response = new ResponseError(
-        'fail',
-        'Faltan campos obligatorios en la solicitud',
-        'El id del tramite no exite, porfavor ingresa un id existente.',
-        []
-    ).responseApiError();
-
-    return res.status(400).json(response);
+      if (!usuarioExiste) {
+          // Manejo de error cuando el usuario no existe en la base de datos
+          return res.status(404).json({
+              status: 'fail',
+              message: 'El usuario no existe en la BD'
+          });
       }
 
-    const usuarioExiste = await Usuario.findById(usuario.id)
+      // Validar que idt sea un arreglo de IDs válidos de MongoDB
+      const areValidObjectIds = idt.every(mongoose.isValidObjectId);
+      if (!areValidObjectIds) {
+          return res.status(400).json({
+              status: 'fail',
+              message: 'Alguno de los IDs de tramite no es válido'
+          });
+      }
 
-    if(!usuarioExiste){
-      const response = new ResponseError(
-        'fail',
-        'El usuario no existe',
-        'El usuario no se encuentra en la BD',
-        []).responseApiError();
+      // Crear el proyecto con los datos proporcionados
+      const proyecto = new Proyecto({
+        idt: idt.map(id => ({ id: new mongoose.Types.ObjectId(id) })),
+          nombre,
+          descripcion,
+          empresa,
+          fechainicio,
+          fechafin,
+          estado,
+          usuario: usuario.id
+      });
 
-        res.status(404).json(
-          response
-        )
-    }
+      await proyecto.save();
 
-    // Validar que idt sea un ID válido de MongoDB
-    if (!mongoose.isValidObjectId(idt)) {
-      const response = new ResponseError(
-        'fail',
-        'Faltan campos obligatorios en la solicitud',
-        'Ingrese porfavor los campos requeridos para crear su proyecto',
-        []
-    ).responseApiError();
-    return res.status(400).json(response);
-    }
-
-    
-
-
-    const proyecto = new Proyecto({ idt, nombre, descripcion, empresa, fechainicio, fechafin, estado, usuario: usuario.id });
-
-    try {
-        await proyecto.save();
-        res.status(200).json({
-            status: 'success',
-            data: proyecto,
-            message: 'Proyecto Creado Correctamente'
-        });
-    } catch (ex) {
-        const response = new ResponseError(
-            'fail',
-            'No se pudo crear el proyecto',
-            ex.message,
-            []
-        ).responseApiError();
-
-        return res.status(500).json(response);
-    }
+      res.status(200).json({
+          status: 'success',
+          data: proyecto,
+          message: 'Proyecto Creado Correctamente'
+      });
+  } catch (ex) {
+      console.error(ex);
+      res.status(500).json({
+        status: 'fail',
+        message: 'No se pudo crear el proyecto'
+    });
+  }
 }
 
-//USER
 
+////////////////////USER///////////////////////////////////////
+//GET  POR ID Y USUARIO DE LA REQ.
 const misProyectos = async (req, res) =>{
 
   const usuario = req.usuario;
@@ -160,16 +148,155 @@ if (id) {
 
   
 }
-
-//GET  POR ID Y USUARIO DE LA REQ.
 //ACTUALIZAR MIS PROYECTOS
+const actualizarProyecto = async (req, res) =>{
+  const { id } = req.params;
+  const nuevoProyecto = req.body;
+  const usuario = req.usuario;
+
+  //  console.log(usuario.id)
+
+  if (!id) {
+    const response = new ResponseError(
+      'fail',
+      'ID no ingresado',
+      'Proporciona un id de un proyecto',
+      []
+    ).responseApiError();
+
+    return res.status(500).json(response);
+  }
+
+  // Validar si el ID es un ObjectId válido de MongoDB
+  if (!mongoose.isValidObjectId(id)) {
+    const response = new ResponseError(
+      'fail',
+      'ID inválido',
+      'El ID proporcionado no es válido',
+      []
+    ).responseApiError();
+
+    return res.status(400).json(response);
+  }
+
+  let proyecto = await Proyecto.findOne({ _id: id });
+
+  if (!proyecto) {
+    const response = new ResponseError(
+      'fail',
+      'Proyecto no encontrado',
+      'No hay ningún proyecto, por favor asigna un proyecto existente',
+      []
+    ).responseApiError();
+
+    return res.status(404).json(response);
+  }
+  //  console.log(proyecto.usuario)
+try {
+  
+    if (usuario.id == proyecto.usuario) {
+      proyecto.set(nuevoProyecto); // Actualiza los campos con los valores del nuevoProyecto
+    await proyecto.save();
+    } else{
+      const response = new ResponseError(
+        'fail',
+        'No puedes actualizar este proyecto, no cuentas con el permiso necesario',
+        'No puedes actualizar el proyecto , porfavor actualiza uno de tus proyectos',
+        []).responseApiError();
+  
+      res.status(500).json(
+        response
+      )
+    }
+
+  res.status(200).json({
+    status: 'successful',
+    data: proyecto,
+    message: 'Proyecto Actualizado Correctamente',
+  });
+} catch (ex) {
+  const response = new ResponseError(
+    'fail',
+    'Hubo error al actualizar el proyecto',
+    ex.message,
+    []). responseApiError();
+
+    res.status(500).json(
+      response
+    )
+}
+
+  
+}
 //ELIMINAR MIS PROYECTOS
+const borrarProyecto = async (req, res) => {
+  const { id } = req.params;
+  const usuario = req.usuario;
+
+  // console.log(usuario.id)
+  // Validar si el ID es un ObjectId válido de MongoDB
+  if (!mongoose.isValidObjectId(id)) {
+    const response = new ResponseError(
+      'fail',
+      'ID inválido',
+      'El ID proporcionado no es válido',
+      []
+    ).responseApiError();
+
+    return res.status(400).json(response);
+  }
+
+  try {
+    // Buscar el proyecto por su ID
+    const proyectoEncontrado = await Proyecto.findOne({ _id: id });
+
+    if (!proyectoEncontrado) {
+      const response = new ResponseError(
+        'fail',
+        'Proyecto no encontrado',
+        'El proyecto no se encuentra al realizar la búsqueda',
+        []
+      ).responseApiError();
+
+      return res.status(404).json(response);
+    }
+    // console.log(proyectoEncontrado.usuario)
+
+    if (usuario.id == proyectoEncontrado.usuario) {
+      // Eliminar el proyecto encontrado
+      await proyectoEncontrado.deleteOne(); // Utilizar deleteOne() en lugar de delete()
+    } else {
+      const response = new ResponseError(
+        'fail',
+        'No tienes el permiso para eliminar este proyecto',
+        'No puedes eliminar este proyecto porque no cuentas con el permiso necesario',
+        []
+      ).responseApiError();
+  
+      return res.status(500).json(response);
+    }
+
+    res.status(200).json({
+      status: 'successful',
+      message: 'Proyecto eliminado correctamente',
+    });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al eliminar el proyecto',
+      ex.message,
+      []
+    ).responseApiError();
+
+    return res.status(500).json(response);
+  }
+};
 
 
 
 
 
-//ADMIN
+///////////////////ADMIN////////////////////////////////
 const mostrarProyectos = async (req, res) => {
   const { limit = 10, page = 1 } = req.query;
 
@@ -195,7 +322,6 @@ const mostrarProyectos = async (req, res) => {
     return res.status(500).json(response);
   }
 };
-
 const actualizarProyectos = async (req, res) => {
   const { id } = req.params;
   const nuevoProyecto = req.body;
@@ -246,7 +372,6 @@ const actualizarProyectos = async (req, res) => {
     res.status(500).json(response);
   }
 };
-
 const borrarProyectos = async (req, res) =>{
  
     const {id} = req.params;
@@ -306,5 +431,7 @@ module.exports = {
     mostrarProyectos,
     actualizarProyectos,
     borrarProyectos,
-    misProyectos
+    misProyectos,
+    actualizarProyecto,
+    borrarProyecto
 }

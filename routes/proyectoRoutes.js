@@ -3,11 +3,15 @@ const { crearProyecto,
         mostrarProyectos,
         actualizarProyectos,
         borrarProyectos,
-        misProyectos } = require('../controllers/proyectoController')
+        misProyectos,
+        actualizarProyecto,
+        borrarProyecto } = require('../controllers/proyectoController')
 
 const { protect } = require('../middlewares/auth-validar');
 const router = Router();
 
+
+//RUTAS PARA TODOS
 router.post('/',[
     protect
 ], crearProyecto )
@@ -17,7 +21,13 @@ router.get('/misProyectos',[
     protect
 ], misProyectos)
 
+router.put('/actualizarProyecto/:id',[
+    protect
+], actualizarProyecto )
 
+router.delete('/borrarProyecto/:id',[
+    protect
+],borrarProyecto)
 
 //ADMIN
 router.get('', mostrarProyectos )

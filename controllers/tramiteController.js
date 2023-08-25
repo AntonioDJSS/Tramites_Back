@@ -467,6 +467,29 @@ const mostrarTramite = async (req, res) => {
   }
 };
 
+const mostrarTramitesTodo = async (req, res) =>{
+
+  try {
+    // Realizar la consulta a la base de datos con el paginado
+    const tramite = await Tramite.find();
+    res.status(200).json({
+      status: "successful",
+      data: tramite,
+      message: 'Registros Encontrados'
+    });
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al mostrar los tramites',
+      ex.message,
+      []).responseApiError();
+
+    res.status(500).json(
+      response
+    )
+  }
+}
+
 module.exports = {
   actualizarTramite,
   borrarTramite,
@@ -475,6 +498,7 @@ module.exports = {
   cargarTramite,
   crearTramite,
   mostrarTramite,
-  excel
+  mostrarTramitesTodo,
+  excel,
 
 }

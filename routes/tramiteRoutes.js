@@ -6,7 +6,8 @@ const { actualizarTramite,
         mostrarTramite,
         borrarTramite,
         borrarAllTramite,
-        cargarTramite, excel } = require('../controllers/tramiteController')
+        cargarTramite, excel,
+        mostrarTramitesTodo } = require('../controllers/tramiteController')
 const { protect } = require ('../middlewares/auth-validar')
 const { esAdminRole, tieneRole } = require('../middlewares/validar-roles');
 const { validarCampos } = require('../middlewares/validar-campos');
@@ -29,6 +30,8 @@ router.get('/',[
 ], mostrarTramite)
 
 
+router.get('/mostrarTramitesTodo', 
+ mostrarTramitesTodo)
 
 //Protegidas ADMIN
 
