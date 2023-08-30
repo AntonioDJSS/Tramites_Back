@@ -1,24 +1,32 @@
+const AWS = require('aws-sdk');
 const puppeteer = require('puppeteer');
-const fs = require('fs'); // Agrega el módulo fs para trabajar con archivos
-const ResponseError = require('../utils/ResponseError')
+const ResponseError = require('../utils/ResponseError');
 const mongoose = require('mongoose');
-const Tramite = require('../models/tramite')
+const Tramite = require('../models/tramite');
+
+// Configura las credenciales de DigitalOcean Spaces
+AWS.config.update({
+    accessKeyId: process.env.NAME_TOKEN,
+    secretAccessKey: process.env.TOKEN_DO
+});
+
+const s3 = new AWS.S3({
+    endpoint: new AWS.Endpoint(`https://${process.env.NAME_SPACES}.digitaloceanspaces.com`)
+});
 
 const generarPdf = async (req, res) => {
     const { id } = req.params;
 
-    //Validamos id existente
     if (!id) {
-
         const response = new ResponseError(
             'fail',
             'Id del tramite no existe',
-            'Ingresa porfavor el ID del tramite',
-            []).responseApiError();
-        return res.status(400).json(response)
+            'Ingresa por favor el ID del tramite',
+            []
+        ).responseApiError();
+        return res.status(400).json(response);
     }
 
-    // Validar si el ID es un ObjectId válido de MongoDB
     if (!mongoose.isValidObjectId(id)) {
         const response = new ResponseError(
             'fail',
@@ -26,14 +34,13 @@ const generarPdf = async (req, res) => {
             'El ID proporcionado no es válido en la Base de Datos',
             []
         ).responseApiError();
-
         return res.status(400).json(response);
     }
+
     const tramite = await Tramite.findOne({ _id: id });
-    console.log(tramite.tramites[0].valor)
 
     try {
-        const browser = await puppeteer.launch({ headless: "new" }); // Cambio aquí, Nos estamos preperando para las futuras actualizaciones en los navegadores
+        const browser = await puppeteer.launch({ headless: "new" });
         const page = await browser.newPage();
         const htmlContent = `
         
@@ -291,30 +298,38 @@ const generarPdf = async (req, res) => {
                 bottom: '1cm',
                 left: '1cm'
             },
-            printBackground: true, //Con esta opción se habilita el color de fondo en el pdf
+            printBackground: true,
         });
+
+        const params = {
+            Bucket: process.env.NAME_SPACES,
+            Key: `ruta/del/archivo-${id}.pdf`,
+            Body: pdfBuffer
+        };
+
+        const uploadResult = await s3.send(new PutObjectCommand(params));
+
+        const pdfUrl = uploadResult.Location;
+
+        tramite.pdfUrl = pdfUrl;
+        await tramite.save();
 
         await browser.close();
 
-        const filePath = `upload/example.pdf`; // Ruta donde se guardará el PDF en la carpeta "utils"
-        fs.writeFileSync(filePath, pdfBuffer); // Guarda el PDF en el archivo
-
         res.status(200).json({
-            status: 'sucessful',
+            status: 'success',
             message: 'PDF generado y guardado en carpeta.'
-        })
-
+        });
         
     } catch (ex) {
         const response = new ResponseError(
             'fail',
             'Error generando el PDF',
             ex.message,
-            []).responseApiError();
+            []
+        ).responseApiError();
 
-        res.status(500).json(
-            response
-        )
+        res.status(500).json(response);
     }
 };
 
