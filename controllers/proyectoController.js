@@ -2,6 +2,7 @@ const ResponseError = require('../utils/ResponseError')
 const Proyecto = require('../models/proyecto');
 const mongoose = require('mongoose');
 const Usuario = require('../models/usuario')
+const {ObjectId} = require('mongodb');
 
 
 
@@ -37,14 +38,21 @@ const crearProyecto = async (req, res) => {
           });
       }
 
-      // Validar que idt sea un arreglo de IDs válidos de MongoDB
-      const areValidObjectIds = idt.every(mongoose.isValidObjectId);
-      if (!areValidObjectIds) {
-          return res.status(400).json({
-              status: 'fail',
-              message: 'Alguno de los IDs de tramite no es válido'
-          });
+      if(!(ObjectId.isValid(idt))) {
+        return res.status(400).json({
+      status: 'fail',
+             message: 'Alguno de los IDs de tramite no es válido'
+        });
       }
+
+      // Validar que idt sea un arreglo de IDs válidos de MongoDB
+      // const areValidObjectIds = idt.every(mongoose.isValidObjectId);
+      // if (!areValidObjectIds) {
+      //     return res.status(400).json({
+      //         status: 'fail',
+      //         message: 'Alguno de los IDs de tramite no es válido'
+      //     });
+      // }
 
       // Crear el proyecto con los datos proporcionados
       const proyecto = new Proyecto({
