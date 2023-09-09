@@ -1,22 +1,21 @@
 const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables from .env file
 
 const dbConnection = async() =>{
 
-    //El trycatch me ayuda a estandarizar los errores de mi programa
     try {
-        //Aqui se hace la conexion con la Base de Datos y utilizamos nuestra variable de entorno
-        await mongoose.connect( process.env.MONGODB_CNN, {
-            // useNewUrlParser: true,
-            // useUnifiedTopology: true,
-            // // useCreateIndex: true,
-            // // useFindAndModify: false
-        });
+        const db = await mongoose.connect(process.env.MONGODB_URI, 
+            {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            }
+        );
 
-        console.log('Base de datos online');
-        
+        const url = `${db.connection.host}:${db.connection.port}`;
+        console.log(`MongoDB conectado en: ${url}`);
     } catch (error) {
-        console.log(error);
-        throw new Error('Error a la hora de iniciar la base de datos');
+        console.log(`error: ${error.message}`);
+        process.exit(1);
     }
 
 }
