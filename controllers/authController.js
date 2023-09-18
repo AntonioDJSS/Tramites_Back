@@ -4,7 +4,7 @@ const Usuario = require('../models/usuario');
 const { generarJWT } = require("../helpers/generar-jwt");
 const { googleVerify } = require("../helpers/google-verify");
 const generarId = require("../helpers/generarId");
-// const { emailOlvidePassword, emailRegistro } = require('../helpers/email')
+const { emailOlvidePassword, emailRegistro } = require('../helpers/email')
 const { emailRegistroP, emailOlvidePasswordP } = require('../helpers/emailSender')
 const ResponseError = require('../utils/ResponseError')
 
@@ -132,7 +132,7 @@ const login = async (req, res = response) => {
     } catch (ex) {
         const response = new ResponseError(
             'faild',
-            'Hubo un error al ingresar',
+            'El correo o password son incorrectos porfavor ingresa un correo o password valido',
             ex.message,
             []).responseApiError();
 
@@ -164,7 +164,7 @@ const registrar = async (req, res) => {
         const response = new ResponseError(
             'fail',
             'El correo es obligatorio',
-            'Ingresa el correo porfavor no estas ingresando nada',
+            'Ingresa el correo porfavor, no estas ingresando nada',
             []).responseApiError();
 
         return res.status(400).json(
@@ -222,19 +222,19 @@ const registrar = async (req, res) => {
         );
     }
 
-   // Validar si la contraseña tiene al menos 6 caracteres
-if (password.length < 6) {
-    const response = new ResponseError(
-        'fail',
-        'Contraseña demasiado corta',
-        'La contraseña debe tener al menos 6 caracteres',
-        []
-    ).responseApiError();
+    // Validar si la contraseña tiene al menos 6 caracteres
+    if (password.length < 8) {
+        const response = new ResponseError(
+            'fail',
+            'Contraseña demasiado corta',
+            'La contraseña debe tener al menos 8 caracteres',
+            []
+        ).responseApiError();
 
-    return res.status(400).json(
-        response
-    );
-}
+        return res.status(400).json(
+            response
+        );
+    }
 
     try {
         const salt = bcryptjs.genSaltSync();
@@ -279,11 +279,13 @@ if (password.length < 6) {
         )
     }
 
-    emailRegistroP({
+    
+    emailRegistro({
         correo: usuario.correo,
         nombre: usuario.nombre,
         token: usuario.token,
-    });
+        });
+            
 
     res.status(200).json({
         status: 'successful',
@@ -291,7 +293,8 @@ if (password.length < 6) {
         message: 'Usuario Creado Correctamente'
     });
 
-};
+}
+
 
 const cerrarSesion = async (req, res) => {
     res.cookie('jwt', 'CerrarSesion', {
@@ -421,7 +424,7 @@ const olvidePassword = async (req, res = response) => {
     try {
         await usuario.save();
         //enviar email
-        emailOlvidePasswordP({
+        emailOlvidePassword({
             correo: usuario.correo,
             nombre: usuario.nombre,
             token: usuario.token,
@@ -490,6 +493,32 @@ const nuevoPassword = async (req, res = response) => {
 
     let usuario = null;
 
+    if (!password) {
+        const response = new ResponseError(
+            'fail',
+            'La contraseña es obligatoria',
+            'Ingresa la contraseña porfavor no estas ingresando nada',
+            []).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+
+    // Validar si la contraseña tiene al menos 6 caracteres
+    if (password.length < 8) {
+        const response = new ResponseError(
+            'fail',
+            'Contraseña demasiado corta',
+            'La contraseña debe tener al menos 8 caracteres',
+            []
+        ).responseApiError();
+
+        return res.status(400).json(
+            response
+        );
+    }
+    
     try {
         usuario = await Usuario.findOne({ token });
     } catch (ex) {

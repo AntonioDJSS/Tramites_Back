@@ -24,7 +24,7 @@ const actualPassword = async (req, res)  =>{
     }
 
     // Validar si la contraseña tiene más de 6 caracteres
-    if (password.length >= 6) {
+    if (password.length < 8) {
         const response = new ResponseError(
             'fail',
             'Contraseña demasiado corta',
