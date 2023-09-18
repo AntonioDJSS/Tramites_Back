@@ -1,10 +1,12 @@
 const sgMail = require('@sendgrid/mail');
-// const ResponseError = require('../utils/ResponseError');
+const ResponseError = require('../utils/ResponseError');
 
 sgMail.setApiKey(process.env.APYKEYSENDGRID);
 
 const emailRegistroP = async (datos, res, req) => {
   const { correo, nombre, token } = datos;
+
+  const confirmarUrl = `${process.env.BASE_URL_S}/confirmar/${token}`;
 
   const msg = {
     to: correo,
@@ -13,7 +15,7 @@ const emailRegistroP = async (datos, res, req) => {
     text: 'Comprueba tu cuenta en IKTAN',
     html: `<p>Hola: ${nombre} Comprueba tu cuenta en IKTAN</p>
       <p>Tu cuenta ya está casi lista, solo debes comprobarla en el siguiente enlace:</p>
-      <a href="http://localhost:5173/confirmar/${token}">Comprobar cuenta</a>
+      <a href="${confirmarUrl}">Comprobar cuenta</a>
       <p>Si tú no creaste esta cuenta, puedes ignorar el mensaje</p>
     `,
   };
@@ -22,12 +24,20 @@ const emailRegistroP = async (datos, res, req) => {
     await sgMail.send(msg);
     console.log('Correo de confirmación enviado con éxito');
   } catch (ex) {
-    console.log('Error al enviar el mensaje.', ex);
+    const response = new ResponseError(
+      'fail',
+      'Error al enviar el mensaje de registro mediante SendGrid',
+      ex.message,
+      []).responseApiError();
+    
+      return response.responseApiError();
   } // Aquí faltaba la llave de cierre '}' para el bloque try
 };
 
 const emailOlvidePasswordP = async (datos, res) => {
   const { correo, nombre, token } = datos;
+
+  const olvideUrl = `${process.env.BASE_URL_S}/olvide-password/${token}`;
 
   const msg = {
     to: correo,
@@ -36,7 +46,7 @@ const emailOlvidePasswordP = async (datos, res) => {
     text: 'Restablece tu contraseña',
     html: `<p>Hola: ${nombre}, has solicitado restablecer tu contraseña</p>
       <p>Sigue el siguiente enlace para generar una nueva contraseña:</p>
-      <a href="http://localhost:5173/login/olvide-password/${token}">Restablecer Contraseña</a>
+      <a href="${olvideUrl}">Restablecer Contraseña</a>
       <p>Si tú no solicitaste este correo, puedes ignorar el mensaje</p>
     `,
   };
@@ -45,7 +55,13 @@ const emailOlvidePasswordP = async (datos, res) => {
     await sgMail.send(msg);
     console.log('Correo de restablecimiento de contraseña enviado con éxito');
   } catch (ex) {
-    console.log('Error al enviar el mensaje.', ex);
+    const response = new ResponseError(
+      'fail',
+      'Error al enviar el mensaje de OlvideContraseña mediante SendGrid',
+      ex.message,
+      []).responseApiError();
+    
+      return response.responseApiError();
   }
 };
 
