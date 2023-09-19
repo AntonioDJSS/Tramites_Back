@@ -26,19 +26,79 @@ const crearProyecto = async (req, res) => {
 
   }
 
-  // Verificar que los campos requeridos estén presentes en la solicitud
-  if (!nombre || !descripcion || !empresa || !fechainicio || !fechafin || !estado) {
+    // Verificar que los campos requeridos estén presentes en la solicitud
+    if (!nombre) {
       // Manejo de error cuando faltan campos obligatorios
     const response = new ResponseError(
       'fail',
-      'Faltan campos obligatorios en la solicitud',
-      'Ingresa porfavor todos los campos en la solicitud',
+      'Faltan campo de nombre en la solicitud',
+      'Ingresa porfavor el campos de nombre en la solicitud',
       []).responseApiError();
 
     return res.status(400).json(
       response
     )
-  }
+    }
+
+    if (!descripcion ) {
+    const response = new ResponseError(
+      'fail',
+      'Falta el campo de descripcion en la solicitud',
+      'Ingresa porfavor el campos de descripcion en la solicitud',
+      []).responseApiError();
+
+    return res.status(400).json(
+      response
+    )
+    }
+
+    if (!empresa) {
+    const response = new ResponseError(
+      'fail',
+      'Falta el campo de empresa en la solicitud',
+      'Ingresa porfavor el campos de empresa en la solicitud',
+      []).responseApiError();
+
+    return res.status(400).json(
+      response
+    )
+    }
+
+    if (!fechainicio) {
+      const response = new ResponseError(
+        'fail',
+        'Faltan campo de fechainicio en la solicitud',
+        'Ingresa porfavor el campos de fechainicio en la solicitud',
+        []).responseApiError();
+  
+      return res.status(400).json(
+        response
+      )
+    }
+
+    if (!fechafin) {
+      const response = new ResponseError(
+        'fail',
+        'Faltan campo de fechafin en la solicitud',
+        'Ingresa porfavor el campos de fechafin en la solicitud',
+        []).responseApiError();
+  
+      return res.status(400).json(
+        response
+      )
+    }
+
+    if (!estado) {
+      const response = new ResponseError(
+        'fail',
+        'Faltan campo de estado en la solicitud',
+        'Ingresa porfavor el estado de nombre en la solicitud',
+        []).responseApiError();
+  
+      return res.status(400).json(
+        response
+      )
+    }
 
     try {
       usuarioExiste = await Usuario.findById(usuario.id);
@@ -463,6 +523,7 @@ const borrarProyectos = async (req, res) =>{
             status: 'successful',
             message: 'Proyecto eliminado correctamente',
           });
+          console.log('BORRADO')
     } catch (ex) {
         const response = new ResponseError(
             'fail',
