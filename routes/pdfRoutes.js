@@ -13,7 +13,7 @@ const router = Router();
 
 //RUtas para Admin y User
 
-
+//En el front No esta agarrando el protect por eso se quito
 router.post('/:id',[
         tieneRole('ADMIN_ROLE', 'USER_ROLE'),
 ], generarPdf );
