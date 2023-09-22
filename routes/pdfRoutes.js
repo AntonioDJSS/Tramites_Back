@@ -15,7 +15,6 @@ const router = Router();
 
 
 router.post('/:id',[
-        protect,
         tieneRole('ADMIN_ROLE', 'USER_ROLE'),
 ], generarPdf );
 
