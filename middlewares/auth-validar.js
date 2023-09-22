@@ -29,6 +29,7 @@ const protect = async ( req, res, next) =>{
         response
       )
     }
+    console.log(token)
 
     
     

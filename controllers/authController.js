@@ -28,7 +28,9 @@ const createSendToken = async (usuario, statusCode, req, res) => {
     // Configurar las opciones de la cookie
     const cookieOptions = {
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        httpOnly: true, // La cookie no puede ser accedida desde JavaScript
+        secure: true,
+        // httpOnly: true, // La cookie no puede ser accedida desde JavaScript
+        sameSite: 'none' // La cookie será accesible desde cualquier sitio
     };
     // Configura la cookie
     res.cookie('jwt', token, cookieOptions);
@@ -298,7 +300,7 @@ const registrar = async (req, res) => {
 
 const cerrarSesion = async (req, res) => {
     res.cookie('jwt', 'CerrarSesion', {
-        expires: new Date(Date.now() + 10 * 1000),
+        expires: new Date(0), 
         secure: true,
         sameSite: 'none',
     });
