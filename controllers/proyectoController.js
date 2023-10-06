@@ -9,11 +9,10 @@ const crearProyecto = async (req, res) => {
 
   let usuarioExiste = null;
 
-  const { idt, nombre, descripcion, empresa, fechainicio, fechafin, estado } = req.body;
+  const { idt, nombre, estado,  fechaIngresoTramite, notas } = req.body;
   const usuario = req.usuario;
-  console.log(usuario)
 
-  if (!usuario) {
+    if (!usuario) {
     // Manejo de error cuando no se encuentra el usuario
     const response = new ResponseError(
       'fail',
@@ -25,8 +24,7 @@ const crearProyecto = async (req, res) => {
       response
     )
 
-  }
-
+    }
     // Verificar que los campos requeridos estén presentes en la solicitud
     if (!nombre) {
       // Manejo de error cuando faltan campos obligatorios
@@ -41,11 +39,11 @@ const crearProyecto = async (req, res) => {
     )
     }
 
-    if (!descripcion ) {
+    if (!estado ) {
     const response = new ResponseError(
       'fail',
-      'Falta el campo de descripcion en la solicitud',
-      'Ingresa porfavor el campos de descripcion en la solicitud',
+      'Falta el campo de estado en la solicitud',
+      'Ingresa porfavor el campos de estado en la solicitud',
       []).responseApiError();
 
     return res.status(400).json(
@@ -53,23 +51,11 @@ const crearProyecto = async (req, res) => {
     )
     }
 
-    if (!empresa) {
-    const response = new ResponseError(
-      'fail',
-      'Falta el campo de empresa en la solicitud',
-      'Ingresa porfavor el campos de empresa en la solicitud',
-      []).responseApiError();
-
-    return res.status(400).json(
-      response
-    )
-    }
-
-    if (!fechainicio) {
+    if (!fechaIngresoTramite) {
       const response = new ResponseError(
         'fail',
-        'Faltan campo de fechainicio en la solicitud',
-        'Ingresa porfavor el campos de fechainicio en la solicitud',
+        'Faltan campo de Fecha de Ingreso del Tramite en la solicitud',
+        'Ingresa porfavor el campos de Fecha de Ingreso del Tramite en la solicitud',
         []).responseApiError();
   
       return res.status(400).json(
@@ -77,23 +63,11 @@ const crearProyecto = async (req, res) => {
       )
     }
 
-    if (!fechafin) {
+    if (!notas) {
       const response = new ResponseError(
         'fail',
-        'Faltan campo de fechafin en la solicitud',
-        'Ingresa porfavor el campos de fechafin en la solicitud',
-        []).responseApiError();
-  
-      return res.status(400).json(
-        response
-      )
-    }
-    console.log(estado)
-    if (!estado) {
-      const response = new ResponseError(
-        'fail',
-        'Faltan campo de estado en la solicitud',
-        'Ingresa porfavor el estado de nombre en la solicitud',
+        'Faltan campo de Notas en la solicitud',
+        'Ingresa porfavor las Notas en la solicitud',
         []).responseApiError();
   
       return res.status(400).json(
@@ -139,7 +113,7 @@ const crearProyecto = async (req, res) => {
         return res.status(400).json(
           response
         );
-}
+      }
 
       // Validar que idt sea un arreglo de IDs válidos de MongoDB
       const areValidObjectIds = idt.every(mongoose.isValidObjectId);
@@ -155,22 +129,86 @@ const crearProyecto = async (req, res) => {
           );
       }
 
-      // Crear el proyecto con los datos proporcionados
-      const proyecto = new Proyecto({
-        idt: idt.map(id => ({ id: new mongoose.Types.ObjectId(id) })),
-          nombre,
-          descripcion,
-          empresa,
-          fechainicio,
-          fechafin,
-          estado,
-          usuario: usuario.id
-      });
+      const idtTramite = idt[0];
+      const idtCompleto = await Tramite.findOne({ _id: idtTramite})
+
+      // Obtener requisitos como un array de objetos
+      const requisitos = idtCompleto.tramites[48].valor.split(';').map(req => ({ requisito: req.trim() }));
+      const fechaPrevencion = idtCompleto.tramites[41].valor;  //Fecha de prevencion
+      const fechaRespuestaPrevencion = idtCompleto.tramites[42].valor;  //Fecha de respuesta a prevencion
+      const fechaRespuesta = idtCompleto.tramites[43].valor;  //Fecha de respuesta
+      
+      console.log(requisitos)
+      console.log(fechaPrevencion)
+      console.log(fechaRespuestaPrevencion)
+      console.log(fechaRespuesta)
+
+    if (!requisitos) {
+      const response = new ResponseError(
+        'fail',
+        'Falta el campo de requisitos en la solicitud',
+        'Ingresa porfavor el campos de requisitos en la solicitud',
+        []).responseApiError();
+  
+      return res.status(400).json(
+        response
+      )
+      }
+
+    if (!fechaPrevencion) {
+        const response = new ResponseError(
+          'fail',
+          'Faltan campo de Fecha de Prevencion en la solicitud',
+          'Ingresa porfavor el campos de Fecha de Prevencion en la solicitud',
+          []).responseApiError();
+    
+        return res.status(400).json(
+          response
+        )
+    }
+      
+    if (!fechaRespuestaPrevencion) {
+        const response = new ResponseError(
+          'fail',
+          'Faltan campo de Fecha de Respuesta a Prevencion en la solicitud',
+          'Ingresa porfavor el estado de Fecha de Respuesta a Prevencion en la solicitud',
+          []).responseApiError();
+    
+        return res.status(400).json(
+          response
+        )
+    }
+  
+    if (!fechaRespuesta) {
+        const response = new ResponseError(
+          'fail',
+          'Faltan campo de Fecha de Respuesta en la solicitud',
+          'Ingresa porfavor el estado de Fecha de Respuesta en la solicitud',
+          []).responseApiError();
+    
+        return res.status(400).json(
+          response
+        )
+    }
+
+    
+
+     // Crear el proyecto con los datos proporcionados
+    const proyecto = new Proyecto({
+      idt: idt.map(id => ({ id: new mongoose.Types.ObjectId(id) })),
+      nombre,
+      estado,
+      requisitos,
+      fechaIngresoTramite,
+      fechaPrevencion,
+      fechaRespuestaPrevencion,
+      fechaRespuesta,
+      notas,
+      usuario: usuario.id
+  });
 
       try {
-
       await proyecto.save();
-
       res.status(200).json({
           status: 'success',
           data: proyecto,
@@ -188,6 +226,7 @@ const crearProyecto = async (req, res) => {
       )
   }
 }
+
 
 
 ////////////////////USER///////////////////////////////////////
@@ -437,6 +476,7 @@ const mostrarProyectos = async (req, res) => {
     res.status(500).json(response);
   }
 };
+
 const actualizarProyectos = async (req, res) => {
   const { id } = req.params;
   const nuevoProyecto = req.body;
@@ -487,6 +527,7 @@ const actualizarProyectos = async (req, res) => {
     res.status(500).json(response);
   }
 };
+
 const borrarProyectos = async (req, res) =>{
  
     const {id} = req.params;

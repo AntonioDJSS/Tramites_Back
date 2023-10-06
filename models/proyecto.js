@@ -12,25 +12,43 @@ const ProyectoSchema = Schema({
     idt: [IdtSubdocumentSchema], // Usa el esquema del subdocumento aquí
     nombre: {
         type: String,
-        required: [true, 'El nombre es obligatorio']
-    },
-    descripcion: {
-        type: String,
-        maxlength: [250, 'La descripción no debe exceder los 250 caracteres']
-    },
-    empresa: {
-        type: String,
-        maxlength: [250, 'La descripción no debe exceder los 250 caracteres']
-    },
-    fechainicio: {
-        type: String
-    },
-    fechafin: {
-        type: String
+        required: [true, 'El nombre es obligatorio'],
+        ref: 'Tramite'
     },
     estado: {
         type: String,
-        maxlength: [250, 'La descripción no debe exceder los 250 caracteres']
+        required: [true, "El estado es obligatoria"],
+        default: 'Pendiente',
+        emun: ['Pendiente','Iniciado','Concluido']
+    },
+    requisitos: [{
+        requisito: {
+            type: String,
+            ref: 'Tramite'
+        },
+        estado:{
+            type: Boolean,
+            default: false,
+        }
+    }],
+    fechaIngresoTramite:{
+        type: String,
+    },
+    fechaPrevencion:{
+        type: String,
+        ref: 'Tramite'
+    },
+    fechaRespuestaPrevencion:{
+        type: String,
+        ref: 'Tramite'
+    },
+    fechaRespuesta:{
+        type: String,
+        ref: 'Tramite'
+    },
+    notas:{
+        type: String,
+        maxlength: [500, 'El número máximo de caracteres para notas es 500']
     },
     usuario: {
         type: mongoose.Schema.ObjectId,
@@ -38,5 +56,6 @@ const ProyectoSchema = Schema({
         ref: 'Usuario'
     }
 });
+
 
 module.exports = model('Proyecto', ProyectoSchema);

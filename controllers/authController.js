@@ -312,39 +312,22 @@ const cerrarSesion = async (req, res) => {
 }
 
 const confirmar = async (req, res = response) => {
-
     const { token } = req.params;
 
-    let usuarioConfirmar = null;
-
     try {
-        usuarioConfirmar = await Usuario.findOne({ token });
-    } catch (ex) {
-        const response = new ResponseError(
-            'fail',
-            'Error al encontrar tu usuario',
-            ex.message,
-            []).responseApiError();
+        const usuarioConfirmar = await Usuario.findOne({ token });
 
-        res.status(400).json(
-            response
-        );
-    }
+        if (!usuarioConfirmar) {
+            const response = new ResponseError(
+                'fail',
+                'Token no valido',
+                'No existe el usuario para confirmar tu cuenta',
+                []
+            ).responseApiError();
 
-    if (!usuarioConfirmar) {
-        const response = new ResponseError(
-            'fail',
-            'Token no valido',
-            'No existe el usuario para confirmar tu cuenta',
-            []).responseApiError();
+            return res.status(403).json(response); // Return here to prevent further execution
+        }
 
-        res.status(403).json(
-            response
-        )
-
-    }
-
-    try {
         usuarioConfirmar.estado = true;
         usuarioConfirmar.token = "";
         await usuarioConfirmar.save();
@@ -357,11 +340,10 @@ const confirmar = async (req, res = response) => {
             'fail',
             'No se pudo confirmar el Usuario',
             ex.message,
-            []).responseApiError();
+            []
+        ).responseApiError();
 
-        res.status(500).json(
-            response
-        )
+        res.status(500).json(response);
     }
 }
 

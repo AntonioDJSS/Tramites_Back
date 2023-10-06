@@ -125,252 +125,245 @@ const generarPdf = async (req, res) => {
     const comentarios = tramite.tramites[36]?.valor || null;
     const requisitos  = tramite.tramites[48].valor || null;
 
-    const htmlContent = `
+    const htmlContent = `<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+            <style>
+            * {
+                font-family: Arial, sans-serif;
+            }
+    
+            body {
+                
+                font-family: Arial, sans-serif;
+            }
+    
+            p {
+                margin: 0;
+                padding: 4px 0px 4px 3px; 
+    
+            }
+    
+            .header {
+                display: flex;
+                width: 99%;
+                align-items: center;
+                border: 1px solid #000;
+            }
+            </style>
+        </head>
+    
+    
+        <body>
+        <div style="display: flex; flex-direction: row; align-items: center; width: 99%; border: 1px solid transparent; font-size: 10px;">
+            <div style="flex-basis: 33.3%;  ">
+                <img width="45%" style="padding-left: 4px;" src="https://iktanstrategies.com/LogoStrategies.png" />
+            </div>
+    
+            <div style="flex-basis: 36.7%; line-height: 0px;  ">
+                <h1> Tramite Petrolero </h1>
+            </div>
+    
+            <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
+                <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid white; height: 33.3%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #D9D9D9; "> Id: </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #f3f3f3;"> ${contadorTramites} </p>
+                </div>
+                <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid white; height: 33.3%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #D9D9D9;"> Autoridad: </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #f3f3f3;"> ${autoridad} </p>
+                </div>
+                <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; height: 33.3%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #D9D9D9;" > Revisión: </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #f3f3f3;"> ${revision} </p>
+                </div>
+            </div>
+        </div>
+    
+        <div style="margin-top: 20px;">
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Trámite: </p>
+                <p style="flex-basis: 55%; border-right: 1px solid white; background-color: #f3f3f3;">${tramite24}</p>
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Tipo:</p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;">${tipo}</p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Regulación: </p>
+                <p style="flex-basis: 55%; border-right: 1px solid white; background-color: #f3f3f3;">${regulacion}</p>
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;"> Homoclave:</p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;">${homoclave} </p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid transparent; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Formato: </p>
+                <p style="flex-basis: 55%; border-right: 1px solid white; background-color: #f3f3f3;">${formato}</p>
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;"></p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;"> </p>
+            </div>
+        </div>
+    
+    
+        <div style="display: flex; flex-direction: row; width: 99%; align-items: center; border: 1px solid white;
+        font-size: 10px; margin-top: 20px;">
+            <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%; ">
+                <p style="flex-basis: 50%; border-right: 1px solid white; background-color: #D9D9D9;">¿Genera Resolución?</p>
+                <p style="flex-basis: 50%; border-right: 1px solid white; background-color: #f3f3f3;">${generaResolucion}</p>
+            </div>
+    
+            <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%;">
+                <p style="flex-basis: 50%; border-right: 1px solid white; background-color: #D9D9D9;">Resolucion: </p>
+                <p style="flex-basis: 50%; background-color: #f3f3f3;">${resolucion}</p>
+            </div>
+        </div>
+    
+        <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none;">
+            <p style="flex-basis: 25%; border-right: 1px solid white; background-color: #D9D9D9;">Plazo para presentar </p>
+            <p style="flex-basis: 75%; background-color: #f3f3f3;">${plazoPresentar}</p>
+        </div>
+    
+        <div style="display: flex; flex-direction: row; align-items: center; width: 99%;  border: 1px solid white; font-size: 10px; border-top: none; height: 100px; ">  
+            <div style="flex-basis: 25%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9; "> Sujeto a Respuesta </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; border-right: 1px solid white; background-color: #f3f3f3; "> ${generaResolucion} </p>
+                </div>
+                <!-- <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9;"> Fecha de Ingreso </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000;"> ${fechaIngreso} </p>
+                </div> -->
+                <!-- <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9;" > Fecha Maxima de Resolución </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000;"> ${fechamaximaResolucion} </p>
+                </div> -->
+                <!-- <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9; "> Fecha Minima de Resolución </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${fechaminimaResolucion} </p>
+                </div> -->
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo de Prevención </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; border-right: 1px solid white; background-color: #f3f3f3; "> ${plazoPrevencion} </p>
+                </div>
+                
+            </div>
+    
+            <div style="flex-basis: 25%; display: flex; flex-direction: column; width: 100%; height: 100%;   ">
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9;  "> Plazo para respuesta a Prevención </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; border-right: 1px solid white; background-color: #f3f3f3;"> ${plazorespuestaPrevencion} </p>
+                </div>
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo de Respuesta de la Autoridad </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; border-right: 1px solid white; background-color: #f3f3f3;"> ${plazorespuestaAutoridad} </p>
+                </div>
+                
+            </div>
+    
+            <div style="flex-basis: 25%; display: flex; flex-direction: column; width: 100%; height: 100%;">
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo Máximo de Respuesta </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; border-right: 1px solid white; background-color: #f3f3f3; "> ${plazomaximoRespuesta} </p>
+                </div>
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #D9D9D9; "> Tiene Monto de derechos o aprovechamientos </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #f3f3f3; "> ${montoderechosAprovechamientos}  </p>
+                </div>
+            </div>
+    
+            <div style="flex-basis: 25%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
+                <!-- <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;"> Nombre del Aprovechamiento </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${nombreAprovechamiento} </p>
+                </div> -->
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100% ; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #D9D9D9;" > Monto mxn 2020 </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #f3f3f3;"> ${monto} </p>
+                </div>
+                <div style="flex-basis: 50%; display: flex; flex-direction: row; width: 100%; border-bottom: 1px solid white; height: 50%;">
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #D9D9D9; ">  </p>
+                    <p style="flex-basis: 50%; border-left: 1px solid white; background-color: #f3f3f3; ">  </p>
+                </div>
+                
+    
+            </div>
+        </div>          
+    
+        <div style="width: 99%; background-color: #D9D9D9; height: 2px; margin-top: 5px; margin-bottom: 5px;">
+    
+        </div>
         
-        <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8" />
-                    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-                    <style>
-                    * {
-                        font-family: Arial, sans-serif;
-                    }
     
-                    body {
-                        
-                        font-family: Arial, sans-serif;
-                    }
-
-                    p {
-                        margin: 0;
-                        padding: 4px 0px 4px 3px; 
-
-                    }
-            
-                    .header {
-                        display: flex;
-                        width: 99%;
-                        align-items: center;
-                        border: 1px solid #000;
-                    }
-                    </style>
-                </head>
-
-
-                <body>
-                <div style="display: flex; flex-direction: row; align-items: center; width: 99%; border: 1px solid #000; font-size: 10px;">
-                    <div style="flex-basis: 33.3%;  ">
-                        <img width="45%" style="padding-left: 4px;" src="https://iktanstrategies.com/LogoStrategies.png" />
-                    </div>
-
-                    <div style="flex-basis: 36.7%; line-height: 0px;  ">
-                        <h1> Tramite Petrolero </h1>
-                    </div>
-
-                    <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 33.3%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; "> Id: </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${contadorTramites} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 33.3%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;"> Autoridad: </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${autoridad} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; height: 33.3%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;" > Revisión: </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000;"> ${revision} </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Trámite: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${tramite24}</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Tipo:</p>
-                        <p style="flex-basis: 15%; ">${tipo}</p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Regulación: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${regulacion}</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;"> Homoclave:</p>
-                        <p style="flex-basis: 15%; ">${homoclave} </p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Formato: </p>
-                        <p style="flex-basis: 55%; border-right: 1px solid #000;">${formato}</p>
-                        <p style="flex-basis: 15%; border-right: 1px solid #000;"></p>
-                        <p style="flex-basis: 15%; "> </p>
-                    </div>
-                </div>
-
-
-                <div style="display: flex; flex-direction: row; width: 99%; align-items: center; border: 1px solid #000;
-                font-size: 10px; margin-top: 20px;">
-                    <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%; ">
-                        <p style="flex-basis: 50%; border-right: 1px solid #000; background-color: #D9D9D9;">¿Genera Resolución?</p>
-                        <p style="flex-basis: 50%; border-right: 1px solid #000;">${generaResolucion}</p>
-                    </div>
-
-                    <div style="display: flex; flex-basis: 50%; flex-direction: row; width: 50%;">
-                        <p style="flex-basis: 50%; border-right: 1px solid #000; background-color: #D9D9D9;">Resolucion: </p>
-                        <p style="flex-basis: 50%;">${resolucion}</p>
-                    </div>
-                </div>
-
-                <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000;
-                border-top: none;">
-                    <p style="flex-basis: 25%; border-right: 1px solid #000; background-color: #D9D9D9;">Plazo para presentar </p>
-                    <p style="flex-basis: 75%;">${plazoPresentar}</p>
-                </div>
-
-
-                <div style="display: flex; flex-direction: row; align-items: center; width: 99%;  border: 1px solid #000; font-size: 10px; border-top: none; height: 300px; ">  
-                    <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Sujeto a Respuesta </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${generaResolucion} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9;"> Fecha de Ingreso </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000;"> ${fechaIngreso} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9;" > Fecha Maxima de Resolución </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000;"> ${fechamaximaResolucion} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Fecha Minima de Resolución </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${fechaminimaResolucion} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo de Prevención </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${plazoPrevencion} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo para respuesta a Prevención </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${plazorespuestaPrevencion} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo de Respuesta de la Autoridad </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${plazorespuestaAutoridad} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; background-color: #D9D9D9; "> Plazo Máximo de Respuesta </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; border-right: 1px solid #000; "> ${plazomaximoRespuesta} </p>
-                        </div>
-                    </div>
-
-                    <div style="flex-basis: 40%; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; ">
-                        <p>Aqui va una imagen</p>
-                    </div>
-
-                    <div style="flex-basis: 30%; display: flex; flex-direction: column; width: 100%; height: 100%; ">
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; "> Tiene Monto de derechos o aprovechamientos </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${montoderechosAprovechamientos}  </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;"> Nombre del Aprovechamiento </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; "> ${nombreAprovechamiento} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; border-bottom: 1px solid #000; height: 33.3%; height: 12%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;" > Monto mxn 2020 </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000;"> ${monto} </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 12%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; ">  </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;">  </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99% ; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;" >  </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000;">  </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9; ">  </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
-                        </div>
-                        <div style="flex-basis: 33%; display: flex; flex-direction: row; width: 99%; border-bottom: 1px solid #000; height: 13%;">
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; background-color: #D9D9D9;">  </p>
-                            <p style="flex-basis: 50%; border-left: 1px solid #000; ">  </p>
-                        </div>
-
-                    </div>
-
-                </div>          
-
-                <div style="margin-top: 20px;">
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Detonante: </p>
-                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${detonante}</p>
-                        <p style="flex-basis: 14%; border-right: 1px solid #000; background-color: #D9D9D9;">Presentación: </p>
-                        <p style="flex-basis: 15%; ">${presentacion}</p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Articulos: </p>
-                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${articulos}</p>
-                        <p style="flex-basis: 14%; border-right: 1px solid #000; background-color: #D9D9D9;">Periodicidad: </p>
-                        <p style="flex-basis: 15%; ">${periodicidad}</p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;"> Regulacion (link): </p>
-                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${regulacionLink}</p>
-                        <p style="flex-basis: 14%; border-right: 1px solid #000;"> </p>
-                        <p style="flex-basis: 15%; "></p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Referencia: </p>
-                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${referencia}</p>
-                        <p style="flex-basis: 14%; border-right: 1px solid #000;"></p>
-                        <p style="flex-basis: 15%; "></p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Comentarios: </p>
-                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${comentarios}</p>
-                        <p style="flex-basis: 14%; border-right: 1px solid #000;"> </p>
-                        <p style="flex-basis: 15%; "> </p>
-                    </div>
-                </div>
-
-                <div>
-                    <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid #000; border-top: none; ">
-                        <p style="flex-basis: 15%; border-right: 1px solid #000; background-color: #D9D9D9;">Requisitos: </p>
-                        <p style="flex-basis: 56%; border-right: 1px solid #000;">${requisitos}</p>
-                        <p style="flex-basis: 14%; border-right: 1px solid #000;"></p>
-                        <p style="flex-basis: 15%; "> </p>
-                    </div>
-                </div>
-
+        <div style="display: flex; width: 99%; justify-content: center; align-items: center;">
+            <img style="width: 99%;"  src="https://pdftramites.nyc3.digitaloceanspaces.com/ImagenesPDF/Etapas%20Contractuales.png" alt="Aqui va la imagen" >
+        </div>
     
-            </body>
-  </html>
-        
-        `; // Obtén el contenido HTML de la vista
+        <div style="margin-top: 20px;">
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Detonante: </p>
+                <p style="flex-basis: 56%; border-right: 1px solid white; background-color: #f3f3f3;">${detonante}</p>
+                <p style="flex-basis: 14%; border-right: 1px solid white; background-color: #D9D9D9;">Presentación: </p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;">${presentacion}</p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Articulos: </p>
+                <p style="flex-basis: 56%; border-right: 1px solid white; background-color: #f3f3f3;">${articulos}</p>
+                <p style="flex-basis: 14%; border-right: 1px solid white; background-color: #D9D9D9;">Periodicidad: </p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;">${periodicidad}</p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;"> Regulacion (link): </p>
+                <p style="flex-basis: 56%; border-right: 1px solid white; background-color: #f3f3f3;">${regulacionLink}</p>
+                <p style="flex-basis: 14%; border-right: 1px solid white; background-color: #D9D9D9;"> </p>
+                <p style="flex-basis: 15%;  background-color: #f3f3f3;"></p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Referencia: </p>
+                <p style="flex-basis: 56%; border-right: 1px solid white; background-color: #f3f3f3;">${referencia}</p>
+                <p style="flex-basis: 14%; border-right: 1px solid white; background-color: #D9D9D9;"></p>
+                <p style="flex-basis: 15%;  background-color: #f3f3f3;"></p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Comentarios: </p>
+                <p style="flex-basis: 56%; border-right: 1px solid white; background-color: #f3f3f3;">${comentarios}</p>
+                <p style="flex-basis: 14%; border-right: 1px solid white; background-color: #D9D9D9;"> </p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;"> </p>
+            </div>
+        </div>
+    
+        <div>
+            <div style="display: flex; flex-direction: row; width: 99%; font-size: 10px; border: 1px solid white; border-top: none; ">
+                <p style="flex-basis: 15%; border-right: 1px solid white; background-color: #D9D9D9;">Requisitos: </p>
+                <p style="flex-basis: 56%; border-right: 1px solid white; background-color: #f3f3f3;">${requisitos}</p>
+                <p style="flex-basis: 14%; border-right: 1px solid white; background-color: #D9D9D9;"></p>
+                <p style="flex-basis: 15%; background-color: #f3f3f3;"> </p>
+            </div>
+        </div>
+    
+    
+    </body>
+    </html>
+    `;
 
     try {
         await page.setContent(htmlContent);   

@@ -7,11 +7,12 @@ const emailRegistro = async (datos) =>{
     try {
 
       const transport = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
+        // host: "sandbox.smtp.mailtrap.io",
+        // port: 2525,
+        service: 'SendGrid',
         auth: {
-          user: process.env.MAILTRAP_USER,
-          pass: process.env.MAILTRAP_PASS,
+          user: process.env.USERNAMESENDGRID,
+          pass: process.env.APYKEYSENDGRID,
         }
       });
 
@@ -19,11 +20,11 @@ const emailRegistro = async (datos) =>{
 
       //Información del email
       const info = await transport.sendMail({
-        from: '"IKTAN-Tramites" <iktanstrategies@iktanst.com>',
+        from: '"Tramites" <antoniodjss2000@gmail.com>',
         to: correo,
-        subject: "IKTAN - Comprueba tu cuenta",
-        text: "Comprueba tu cuenta en IKTAN",
-        html: `<p>Hola: ${nombre} Comprueba tu cuenta en IKTAN</p>
+        subject: "IKTAN Tramites | Confirma cuenta",
+        text: "Confirma tu cuenta para poder ingresar a IKTAN Tramites",
+        html: `<p>Hola: ${nombre} Comprueba tu cuenta para obtener acceso a la plataforma</p>
         <p>Tu cuenta ya esta casi lista, solo debes comprobarla en el siguiente enlace:
 
         <a href="${confirmarUrl}">Comprobar cuenta</a>
@@ -40,6 +41,7 @@ const emailRegistro = async (datos) =>{
       []).responseApiError();
 
        // Devolver la respuesta de error utilizando tu clase ResponseError
+       console.log(ex)
        return response.responseApiError();
     }
 }
@@ -50,21 +52,22 @@ const emailOlvidePassword = async (datos) =>{
 
   try {
   const transport = nodemailer.createTransport({
-      host: "sandbox.smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        user: process.env.MAILTRAP_USER,
-        pass: process.env.MAILTRAP_PASS,
-      }
+      // host: "sandbox.smtp.mailtrap.io",
+      // port: 2525,
+      service: 'SendGrid',
+        auth: {
+          user: process.env.USERNAMESENDGRID,
+          pass: process.env.APYKEYSENDGRID,
+        }
     });
 
     const olvideUrl = `${process.env.BASE_URL}/olvide-password/${token}`;
 
     //Información del email
     const info = await transport.sendMail({
-      from: '"IKTAN-Tramites" <iktanstrategies@iktanst.com>',
+      from: '"Tramites" <antoniodjss2000@gmail.com>',
       to: correo,
-      subject: "IKTAN - Restablece tu password",
+      subject: "IKTAN Tramites | Restablece tu password",
       text: "Restablece tu password",
       html: `<p>Hola: ${nombre} has solicitado reestablecer tu password</p>
       <p>Sigue el siguiente enlace para generar un password:
