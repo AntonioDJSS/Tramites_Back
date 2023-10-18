@@ -1,14 +1,16 @@
 const { Router } = require("express")
-const { crearProyecto,
+const { cargarArchivoRequisito,
+        crearProyecto,
         mostrarProyectos,
         actualizarProyectos,
         borrarProyectos,
         misProyectos,
         actualizarProyecto,
-        borrarProyecto } = require('../controllers/proyectoController')
+        borrarProyecto,
+        archivo,
+        borrarArchivoRequisito } = require('../controllers/proyectoController')
 
 const { protect } = require('../middlewares/auth-validar');
-const { esRoleValido } = require ('../helpers/db-validators');
 const { esAdminRole, tieneRole } = require('../middlewares/validar-roles');
 
 const router = Router();
@@ -19,6 +21,18 @@ router.post('/',[
     protect,
     // tieneRole('ADMIN_ROLE', 'USER_ROLE'),
 ], crearProyecto )
+
+router.post('/cargarArchivoRequisito',[
+    // protect,
+    // tieneRole('ADMIN_ROLE', 'USER_ROLE')
+],archivo,cargarArchivoRequisito)
+
+router.delete('/borrarArchivoRequisito/:idProyecto/:idRequisito',[
+    // protect,
+    // tieneRole('ADMIN_ROLE', 'USER_ROLE')
+], borrarArchivoRequisito)
+
+
 
 //USER
 router.get('/misProyectos',[

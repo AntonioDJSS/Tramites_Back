@@ -144,7 +144,6 @@ const getMe = (req,res,next)=>{
 
 const oneUser = getOne(Usuario);
 
-
 //Operaciones CRUD con los Usuarios.
 const usuariosGet = async (req = request, res = response) => {
   

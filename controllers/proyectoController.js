@@ -1,9 +1,25 @@
 const ResponseError = require('../utils/ResponseError')
 const Proyecto = require('../models/proyecto');
+const Tramite = require('../models/tramite');
 const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const Usuario = require('../models/usuario')
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({storage})
+const archivo = upload.single('archivo');
+const { PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { S3 } = require("@aws-sdk/client-s3");
 
-
+const s3Client = new S3({
+  forcePathStyle: false,
+  endpoint: process.env.S3_ENDPOINT , // Cambia la URL del endpoint
+  region: process.env.REGION_DO,
+  credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
+});
 
 const crearProyecto = async (req, res) => {
 
@@ -227,7 +243,217 @@ const crearProyecto = async (req, res) => {
   }
 }
 
+const cargarArchivoRequisito = async (req, res) =>{
+  
+  const archivo = req.file;
+  const idProyecto = req.body.idProyecto;
+  const idRequisitoCadena = req.body.idRequisito;
+  const idRequisito = new ObjectId(idRequisitoCadena);
+  // Verificamos si se ha enviado un archivo
+  if (!archivo ) {
+    const response = new ResponseError(
+      'fail',
+      'No hay archivos que subir',
+      'No se ha cargado ningun archivo, porfavor carga un archivo',
+      []).responseApiError();
+    
+    return res.status(400).json(
+      response
+    )
+  }
 
+  if (!idProyecto ) {
+    const response = new ResponseError(
+      'fail',
+      'No hay ningun id',
+      'No se ha ingresado ningun id',
+      []).responseApiError();
+    
+    return res.status(400).json(
+      response
+    )
+  }
+
+  if (!idRequisito ) {
+    const response = new ResponseError(
+      'fail',
+      'No hay ningun id del Requisito',
+      'No se ha ingresado ningun id del Requisito',
+      []).responseApiError();
+    
+    return res.status(400).json(
+      response
+    )
+  }
+
+  const nombreCortado = archivo.originalname.split('.');
+  const extension = nombreCortado[nombreCortado.length - 1];
+
+  // Validar la extensión
+  const extensionesValidas = ['xlsx','pdf'];
+  if (!extensionesValidas.includes(extension)) {
+
+    const response = new ResponseError(
+      'fail',
+      `La extensión ${extension} no es permitida, las extensiones permitidas son: ${extensionesValidas.join(', ')}`,
+      'La extencion con la que se cargo el archivo no es valida, coloca la correcta porfavor',
+      []).responseApiError();
+
+    return res.status(400).json(
+      response
+    )
+  }
+
+  //Parámetros para cargar el archivo en el depósito
+  const uploadParams = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `ArchivosRequisitos/archivo-${idRequisito}`,
+    Body: archivo.buffer,
+    ACL: 'public-read',
+  };
+
+  try {
+    uploadResult = await s3Client.send(new PutObjectCommand(uploadParams));
+  } catch (ex) {
+    const response = new ResponseError(
+        'fail',
+        'Error al subir el archivo a Digital Ocean',
+        ex.message,
+        []).responseApiError();
+
+    res.status(500).json(
+        response
+    )
+  }
+
+  try {
+    archivoUrl = `https://${process.env.BUCKET_NAME}.${process.env.S3_ENDPOINT_SINHTTP}/ArchivosRequisitos/archivo-${idRequisito}`;
+  } catch (ex) {
+    const response = new ResponseError(
+        'fail',
+        'Error al Generar el URL del PDF',
+        ex.message,
+        []).responseApiError();
+
+    res.status(500).json(
+        response
+    )
+  }
+
+  const queryProyecto = await Proyecto.findOne({ _id:idProyecto })
+  const objetoEncontrado = queryProyecto.requisitos.find(requisito => requisito._id.equals(idRequisito));
+  
+  if (objetoEncontrado.archivoRequisito.length > 0) {
+    objetoEncontrado.archivoRequisito[0].url = archivoUrl;
+    objetoEncontrado.archivoRequisito[0].key = `ArchivosRequisitos/archivo-${idRequisito}`;
+  }else{
+    objetoEncontrado.archivoRequisito.push({
+      url: archivoUrl,
+      key: `ArchivosRequisitos/archivo-${idRequisito}`
+    });
+  }
+
+  try {
+    await queryProyecto.save();
+} catch (ex) {
+    const response = new ResponseError(
+        'fail',
+        'Error al guardar el tramite',
+        ex.message,
+        []).responseApiError();
+
+    res.status(500).json(
+        response
+    )
+}
+
+  res.status(500).json({
+    msg: "Aqui se cargan los requisitos."
+  })
+}
+
+const borrarArchivoRequisito = async ( req, res) =>{
+
+  const {idProyecto} = req.params;
+  const {idRequisito} = req.params;
+
+  if (!idProyecto ) {
+    const response = new ResponseError(
+      'fail',
+      'No hay ningun id',
+      'No se ha ingresado ningun id',
+      []).responseApiError();
+    
+    return res.status(400).json(
+      response
+    )
+  }
+
+  if (!idRequisito ) {
+    const response = new ResponseError(
+      'fail',
+      'No hay ningun id del Requisito',
+      'No se ha ingresado ningun id del Requisito',
+      []).responseApiError();
+    
+    return res.status(400).json(
+      response
+    )
+  }
+
+  //!Se hace la consulta al a base de Datos para poder borrar la Key, Url Y lo de Aws
+  const queryProyecto = await Proyecto.findOne({ _id:idProyecto })
+  const objetoEncontrado = queryProyecto.requisitos.find(requisito => requisito._id.equals(idRequisito));
+
+  // //!Vamos a borrar primero el archivo de DIGITAL OCEAN
+  // Parámetros para cargar el archivo en el depósito
+  const uploadParams = {
+    Bucket: process.env.BUCKET_NAME ,
+    Key: objetoEncontrado.archivoRequisito[0].key,
+  };
+
+  try {
+    const uploadResult = await s3Client.send( new DeleteObjectCommand(uploadParams));
+  } catch (ex) {
+    const response = new ResponseError(
+      'fail',
+      'Error al Eliminar el PDF del Tramite Seleccionado',
+      ex.message,
+      []).responseApiError();
+  
+    res.status(500).json(
+      response
+    )
+  }
+
+  if (objetoEncontrado.archivoRequisito.length > 0) {
+    objetoEncontrado.archivoRequisito[0].url = null;
+    objetoEncontrado.archivoRequisito[0].key = null;
+  }else{
+    objetoEncontrado.archivoRequisito.push({
+      url: null,
+      key: null
+    });
+  }
+
+  try {
+    await queryProyecto.save();
+} catch (ex) {
+    const response = new ResponseError(
+        'fail',
+        'Error al guardar el tramite',
+        ex.message,
+        []).responseApiError();
+
+    res.status(500).json(
+        response
+    )
+}
+
+  res.status(200).json({
+    msg: "Borrar archivo requisito"
+  })
+}
 
 ////////////////////USER///////////////////////////////////////
 //GET  POR ID Y USUARIO DE LA REQ.
@@ -584,11 +810,14 @@ const borrarProyectos = async (req, res) =>{
 
 
 module.exports = {
+    cargarArchivoRequisito,
     crearProyecto,
     mostrarProyectos,
     actualizarProyectos,
     borrarProyectos,
     misProyectos,
     actualizarProyecto,
-    borrarProyecto
+    borrarProyecto,
+    archivo,
+    borrarArchivoRequisito
 }

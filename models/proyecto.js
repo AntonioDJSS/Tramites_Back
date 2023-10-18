@@ -29,7 +29,21 @@ const ProyectoSchema = Schema({
         estado:{
             type: Boolean,
             default: false,
-        }
+        },
+        archivoRequisito:[
+            {
+                url:{
+                    type: String,
+                    trim: true,
+                    default: null
+                },
+                key:{
+                    type: String,
+                    trim: true,
+                    default: null
+                }
+            }
+        ]
     }],
     fechaIngresoTramite:{
         type: String,
