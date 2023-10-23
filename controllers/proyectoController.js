@@ -25,7 +25,7 @@ const crearProyecto = async (req, res) => {
 
   let usuarioExiste = null;
 
-  const { idt, nombre, estado,  fechaIngresoTramite, notas } = req.body;
+  const { idt, nombre, estado, fechaIngresoTramite, notas } = req.body;
   const usuario = req.usuario;
 
     if (!usuario) {

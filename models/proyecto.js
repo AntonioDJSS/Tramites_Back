@@ -43,6 +43,15 @@ const ProyectoSchema = Schema({
                     default: null
                 }
             }
+        ],
+        requisitoNotas: [
+            {
+                contenido: {
+                    type: String,
+                    trim: true,
+                    default: null
+                }
+            },
         ]
     }],
     fechaIngresoTramite:{
