@@ -20,11 +20,11 @@ const emailRegistro = async (datos) =>{
 
       //Información del email
       const info = await transport.sendMail({
-        from: '"Tramites" <antoniodjss2000@gmail.com>',
+        from: '"DBMIND" <antoniodjss2000@gmail.com>',
         to: correo,
-        subject: "IKTAN Tramites | Confirma cuenta",
-        text: "Confirma tu cuenta para poder ingresar a IKTAN Tramites",
-        html: `<p>Hola: ${nombre} Comprueba tu cuenta para obtener acceso a la plataforma</p>
+        subject: "DBMIND - Comprueba tu cuenta",
+        text: "Comprueba tu cuenta en DBMIND",
+        html: `<p>Hola: ${nombre} Comprueba tu cuenta en DBMIND</p>
         <p>Tu cuenta ya esta casi lista, solo debes comprobarla en el siguiente enlace:
 
         <a href="${confirmarUrl}">Comprobar cuenta</a>
@@ -61,13 +61,13 @@ const emailOlvidePassword = async (datos) =>{
         }
     });
 
-    const olvideUrl = `${process.env.BASE_URL}/olvide-password/${token}`;
+    const olvideUrl = `${process.env.BASE_URL}/login/olvide-password/${token}`;
 
     //Información del email
     const info = await transport.sendMail({
-      from: '"Tramites" <antoniodjss2000@gmail.com>',
+      from: '"DB-Mind" <antoniodjss2000@gmail.com>',
       to: correo,
-      subject: "IKTAN Tramites | Restablece tu password",
+      subject: "DB-Mind - Restablece tu password",
       text: "Restablece tu password",
       html: `<p>Hola: ${nombre} has solicitado reestablecer tu password</p>
       <p>Sigue el siguiente enlace para generar un password:
