@@ -31,7 +31,7 @@ class Server {
 
     // Middleware de CORS y otros middlewares
     middlewares() {
-        const whitelist = ["https://starlit-pastelito-b309d8.netlify.app"];
+        const whitelist = ["https://generadordc3.com"];
 
         const corsOptions = {
             origin: function (origin, callback) {
