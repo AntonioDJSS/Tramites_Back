@@ -6,7 +6,7 @@ sgMail.setApiKey(process.env.APYKEYSENDGRID);
 const emailRegistroP = async (datos, res, req) => {
   const { correo, nombre, token } = datos;
 
-  const confirmarUrl = `${process.env.BASE_URL_S}/confirmar/${token}`;
+  const confirmarUrl = `https://generadordc3.com/confirmar/${token}`;
 
   const msg = {
     to: correo,
@@ -37,7 +37,7 @@ const emailRegistroP = async (datos, res, req) => {
 const emailOlvidePasswordP = async (datos, res) => {
   const { correo, nombre, token } = datos;
 
-  const olvideUrl = `${process.env.BASE_URL_S}/olvide-password/${token}`;
+  const olvideUrl = `https://generadordc3.com/olvide-password/${token}`;
 
   const msg = {
     to: correo,

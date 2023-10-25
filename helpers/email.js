@@ -16,7 +16,7 @@ const emailRegistro = async (datos) =>{
         }
       });
 
-      const confirmarUrl = `${process.env.BASE_URL}/confirmar/${token}`;
+      const confirmarUrl = `https://generadordc3.com/confirmar/${token}`;
 
       //Información del email
       const info = await transport.sendMail({
@@ -61,7 +61,7 @@ const emailOlvidePassword = async (datos) =>{
         }
     });
 
-    const olvideUrl = `${process.env.BASE_URL}/login/olvide-password/${token}`;
+    const olvideUrl = `https://generadordc3.com/login/olvide-password/${token}`;
 
     //Información del email
     const info = await transport.sendMail({
